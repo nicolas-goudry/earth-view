@@ -54,11 +54,12 @@ in {
 
               if test "$COUNT" -gt 0; then
                 RND=$(("$RANDOM" % "$COUNT"))
-                IMG=$(echo "$SOURCE" | ${pkgs.jq}/bin/jq -r '.['"$RND"'].download')
+                IMG=$(echo "$SOURCE" | ${pkgs.jq}/bin/jq -r '.['"$RND"'].url')
+                FILENAME=$(echo "$SOURCE" | ${pkgs.jq}/bin/jq -r '.['"$RND"'].name')
                 DEST_ROOT="${cfg.imageDirectory}"
 
                 if ! test "$IMG" == "null"; then
-                  DEST_NAME="$DEST_ROOT/$(basename $IMG)"
+                  DEST_NAME="$DEST_ROOT/$FILENAME"
 
                   mkdir -p "$DEST_ROOT"
 
