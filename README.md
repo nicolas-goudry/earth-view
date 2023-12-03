@@ -1,6 +1,14 @@
-# earth-view
+# earth-view <!-- omit in toc -->
 
 This repository holds a simple Nix module that registers a systemd service whose goal is to randomly pick an image from the [Google Earth View website](https://earthview.withgoogle.com) and set it as the Gnome desktop background image.
+
+* [Options](#options)
+* [Usage](#usage)
+* [Inner workings](#inner-workings)
+  * [Source of truth](#source-of-truth)
+  * [systemd](#systemd)
+* [Request for help](#request-for-help)
+* [Acknowledgments](#acknowledgments)
 
 ## Options
 
