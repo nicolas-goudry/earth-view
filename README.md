@@ -74,3 +74,5 @@ The module is obviously working, but since I’m new to Nix I believe it could b
 This module is heavily inspired by the [`random-background` service](https://github.com/nix-community/home-manager/blob/9f9e277b60a6e6915ad3a129e06861044b50fdf2/modules/services/random-background.nix) of [`home-manager`](https://github.com/nix-community/home-manager).
 
 The idea to create this module was triggered by the [Google Earth Wallpaper Gnome extension](https://extensions.gnome.org/extension/1295/google-earth-wallpaper/), which is not anymore compatible with Gnome 45.
+
+Last but not least, this would not be possible without the great [Google Earth View](https://earthview.withgoogle.com) website.
