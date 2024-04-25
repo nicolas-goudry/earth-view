@@ -1,78 +1,253 @@
-# earth-view <!-- omit in toc -->
+# 🌎 earth-view
 
-This repository holds a simple Nix module that registers a systemd service whose goal is to randomly pick an image from the [Google Earth View website](https://earthview.withgoogle.com) and set it as the Gnome desktop background image.
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge)
 
-* [Options](#options)
-* [Usage](#usage)
-* [Inner workings](#inner-workings)
-  * [Source of truth](#source-of-truth)
-  * [systemd](#systemd)
-* [Request for help](#request-for-help)
-* [Acknowledgments](#acknowledgments)
+Randomly set desktop background from 2000+ images sourced from [Google Earth View](https://earthview.withgoogle.com).
 
-## Options
+## 📥 Installation
 
-The module is exposed under `services.earthView` and accepts the following options:
+### ❄️ NixOS
 
-| Name | Default value | Description |
-| ---- | ------------- | ----------- |
-| enable | None | Enable the service. |
-| imageDirectory | `$HOME/.earth-view` | Directory where the images will be stored.<br/>_Will be created if it does not exist already._ |
-| interval | `null` | Duration between background image updates.<br/>_If set to `null`, background will be updated upon login only._<br/>_The value should be formatted as a duration understood by systemd._ |
-
-## Usage
+#### Flakes (recommended)
 
 ```nix
-# Import the module into your configuration
-imports = [
-  (builtins.fetchTarball {
-    url = "https://github.com/nicolas-goudry/earth-view/archive/master.tar.gz";
-    # You may have to build your system first and see it failing before updating this to the correct SHA
-    sha256 = "sha256:1xs8hmr8g4fqblih0pk1sqccp1nfcwmmbbqy4a0vvjwkvl8rmczr";
-  })
-];
+{
+  inputs.earth-view.url = "github:nicolas-goudry/earth-view";
+  # Optional, follow your nixpkgs input
+  #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
-# Enable and configure the module
-services.earthView = {
-  enable = true;
-  interval = "4h";
-};
+  outputs = { self, nixpkgs, earth-view }: {
+    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
+      # Customize to your system
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        earth-view.nixosModules.earth-view
+      ];
+    };
+  };
+}
 ```
 
-## Inner workings
+#### `fetchTarball`
+
+```nix
+{ lib, ... }:
+
+{
+  imports = let
+    # Replace this with an actual commit or tag
+    rev = "<replace>";
+  in [
+    "${builtins.fetchTarball {
+      url = "https://github.com/nicolas-goudry/earth-view/archive/${rev}.tar.gz";
+      # Replace this with an actual hash
+      sha256 = lib.fakeHash;
+    }}/modules/nixos"
+  ];
+}
+```
+
+### 🏠 Home Manager
+
+#### Flakes: NixOS system-wide home-manager configuration
+
+```nix
+{
+  inputs.earth-view.url = "github:nicolas-goudry/earth-view";
+  # Optional, follow your nixpkgs input
+  #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
+
+  outputs = { self, nixpkgs, home-manager, earth-view }: {
+    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
+      # Customize to your system
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        home-manager.nixosModules.home-manager {
+          home-manager.sharedModules = [
+            inputs.earth-view.homeManagerModules.earth-view
+          ];
+        }
+      ];
+    };
+  };
+}
+```
+
+#### Flakes: Configuration via home.nix
+
+```nix
+{ inputs, ... }:
+
+{
+  imports = [
+    inputs.earth-view.homeManagerModules.earth-view
+  ];
+}
+```
+
+#### `fetchTarball`: Configuration via home.nix
+
+```nix
+{ lib, ... }:
+
+{
+  imports = let
+    # Replace this with an actual commit or tag
+    rev = "<replace>";
+  in [
+    "${builtins.fetchTarball {
+      url = "https://github.com/nicolas-goudry/earth-view/archive/${rev}.tar.gz";
+      # Replace this with an actual hash
+      sha256 = lib.fakeHash;
+    }}/modules/home-manager"
+  ];
+}
+```
+
+## 🧑‍💻 Usage
+
+```nix
+{
+  services.earth-view = {
+    enable = true;
+    interval = "1h";
+    imageDirectory = "%h/.earth-view"; # Home Manager only
+    display = "fill";
+    enableXinerama = true;
+  }
+}
+```
+
+> [!TIP]
+> Currently, the systemd service is not automatically started. To manually start it, you can use the following commands after applying your configuration:
+>
+> ```shell
+> # NixOS module
+> sudo systemctl start earth-view.service
+> sudo systemctl start earth-view.timer
+>
+> # Home Manager module
+> systemctl --user start eath-view.service
+> systemctl --user start eath-view.timer
+> ```
+
+> [!WARNING]
+> When using the NixOS module with GNOME and a custom background image was already set, you have to reset it in order for the service to work:
+>
+> ```shell
+> gsettings reset org.gnome.desktop.background picture-uri
+> gsettings reset org.gnome.desktop.background picture-uri-dark
+> ```
+>
+> You may also have to logout and login again to see the background applied.
+
+### `enable`
+
+Whether to enable Earth View service.
+
+Note, if you are using NixOS and have set up a custom desktop manager session for Home Manager, then the session configuration must have the `bgSupport` option set to `true` or the background image set by this module may be overwritten.
+
+### `interval`
+
+The duration between changing background image. Set to `null` to only set background when logging in. Should be formatted as a [duration understood by systemd](https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Parsing%20Time%20Spans).
+
+### `imageDirectory`
+
+The directory to which background images should be downloaded. Should be [formatted in a way understood by systemd](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers), e.g., `%h` is the home directory.
+
+> [!IMPORTANT]
+> This option is only available in the Home Manager module, since with the NixOS module we use systemd via the system manager and therefore cannot access the user home directory.
+>
+> Images will be stored in `/etc/earth-view`.
+
+### `display`
+
+Display background images according to this option. See [`feh` documentation](https://man.archlinux.org/man/feh.1.en#BACKGROUND_SETTING) for details.
+
+> [!NOTE]
+> This option has no effect on GNOME shell desktops.
+
+### `enableXinerama`
+
+Will place a separate image per screen when enabled, otherwise a single image will be stretched across all screens.
+
+> [!NOTE]
+> This option has no effect on GNOME shell desktops.
+
+## 🧐 How it works
 
 ### Source of truth
 
-All discovered images from Earth View are saved in the [`earthview.json` file](./earthview.json), which is the source of truth of this module.
+All discovered images URLs from Earth View are saved in [`_earthview.txt`](./_earthview.txt), which is the source of truth of this module.
 
-This file can be updated by running the [`scrape.sh` script](./scripts/scrape.sh), which uses `nix-shell` to create a reproducible interpreted script.\
-The script is using `curl` and `jq` to scrape the Earth View website for known images index (_from 1000 to 15000_). It uses parallelization to speed up the process, but it can be quite long to run depending on the hardware capabilities of the host.\
-_For the record, it takes about 11 minutes to run on a Dell XPS 15 7590 with 64GB of memory, an Intel i9 processor and a not-so-bad fiber connection to the internet._
+To create this file, we use a small [Go module](./src/scraper/main.go) which scrapes the Earth View static assets in order to find valid images URLs. If you want to use it locally:
 
-> [!NOTE]
-> The JSON file is up-to-date as of **December 3, 2023** and contains **2609** references to images.
+```shell
+# Use go
+go run ./scraper
+
+# Use a devshell
+nix develop # ...or nix-shell
+ev-scraper
+
+# Run via nix
+nix run '.#ev-scraper'
+
+# Build it
+nix build '.#ev-scraper' # ...or nix-build -A ev-scraper
+./result/bin/ev-scraper
+```
+
+### Image selection
+
+To select an image, a random line from the source of truth is read and a [Go module](./src/fetcher/main.go) is used to download it and save it to a given location. The need for a Go module comes from the fact that Earth View exposes images as JSON object with a `dataUri` key containing the base64 encoded image. It also contribute to reduce Bash usage.
+
+The images are downloaded at different locations given the module used:
+
+- for NixOS, the path is `/etc/earth-view`, it is not configurable
+- for Home Manager, the path defined by the `imageDirectory` option is used
 
 ### systemd
 
-As mentioned earlier, the module will register a new systemd service (along with a timer service when `interval` is specified). This service will execute a bash script to download the latest version of the source of truth JSON, pick a random image and set it as the Gnome desktop background image (_for both light and dark color schemes_).
+Both modules use a systemd unit, along with a timer when `interval` is specified. The NixOS module uses a system-wide service, while the Home Manager module uses a user-managed service.
 
-The content of the script can be viewed [here](./default.nix#L50-L76).
+These services execute a Bash script which uses the Go module described in the previous section to fetch the image and then set the desktop background accordingly. Read further for more details.
 
-## Request for help
+### Some background
 
-If you like this module and have knowledge of Nix, it would be greatly appreciated if you could help improve it !
+Setting the background is handled differently by NixOS and Home Manager modules. However, both use [`feh`](https://github.com/derf/feh) and/or `gsettings` to apply the background.
 
-The module is obviously working, but since I’m new to Nix I believe it could be improved with the following features:
+Why not only use `feh` would you ask? Well, as of today it does not support setting the GNOME background image. [And it may not ever support it](https://github.com/derf/feh/issues/225).
 
-* expose as a flake
-* support other desktop managers
-* less extensive usage of Bash
-* support other image sources ?
+For Home Manager, we nag it and use **both [`feh`](https://github.com/derf/feh) and `gsettings`** to set the background. Unlike with the NixOS module, there is no clear way to tell if the current desktop manager is GNOME, so by using both methods we are pretty sure that the background will be set. <sub><sup>No, we cannot use `$XDG_CURRENT_DESKTOP`, `loginctl` or any other “classic” mean since we are running systemd.</sup></sub>
 
-## Acknowledgments
+For NixOS and GNOME, things are a little bit hacky. But it works™️. We must deal with `systemd` being run as `root` as well as NixOS immutability:
 
-This module is heavily inspired by the [`random-background` service](https://github.com/nix-community/home-manager/blob/9f9e277b60a6e6915ad3a129e06861044b50fdf2/modules/services/random-background.nix) of [`home-manager`](https://github.com/nix-community/home-manager).
+- we cannot use `gsettings` as it will not have any effect on the current user configuration
+- we cannot interact directly with `dconf`, neither via the command line nor by messing with `/etc/dconf/db/local.d`
 
-The idea to create this module was triggered by the [Google Earth Wallpaper Gnome extension](https://extensions.gnome.org/extension/1295/google-earth-wallpaper/), which is not anymore compatible with Gnome 45.
+Instead, the module does the following:
 
-Last but not least, this would not be possible without the great [Google Earth View](https://earthview.withgoogle.com) website.
+- write a dummy file at `/etc/earth-view/current`
+- define `extraGSettingsOverrides` to set the GNOME background to this file
+- force link the background image to this file
+
+For NixOS and non-GNOME desktops, only `feh` is used.
+
+## 🎩 Acknowledgments
+
+This module is heavily based on the [`random-background` service](https://github.com/nix-community/home-manager/blob/9f9e277b60a6e6915ad3a129e06861044b50fdf2/modules/services/random-background.nix) of [`home-manager`](https://github.com/nix-community/home-manager), by [rycee](https://github.com/rycee).
+
+The idea to create this module was triggered by the [Google Earth Wallpaper Gnome extension](https://extensions.gnome.org/extension/1295/google-earth-wallpaper/), which is not anymore compatible with Gnome 45 or Gnome 46.
+
+Last but not least, this would not be possible without the great [Google Earth View](https://earthview.withgoogle.com) website and the [Chrome extension](https://chromewebstore.google.com/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh).
+
+## 📝 TODO
+
+- [ ] 🏠 Find a way to detect if GNOME is being used as we cannot use config attrset [like we do in NixOS module](./modules/nixos/default.nix#L9)
+- [ ] 🏗 Setup Github Actions to update the image URLs source file
+- [ ] ✨ Avoid downloading image if they already exist
+- [ ] ✨ Add `autoStart` option to enable and start the systemd services
+- [ ] 🧹 Add `autoGC` option to enable images garbage collection
