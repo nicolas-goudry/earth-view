@@ -4,6 +4,13 @@
 
 Randomly set desktop background from 2000+ images sourced from [Google Earth View](https://earthview.withgoogle.com).
 
+Currently supporting:
+
+- X desktops
+- GNOME on wayland or X11
+
+> Wayland compositors support will come soon. [Track issue](https://github.com/nicolas-goudry/earth-view/issues/2).
+
 ## 📥 Installation
 
 ### ❄️ NixOS
@@ -249,5 +256,6 @@ Last but not least, this would not be possible without the great [Google Earth V
 - [ ] 🏠 Find a way to detect if GNOME is being used as we cannot use config attrset [like we do in NixOS module](./modules/nixos/default.nix#L9)
 - [ ] 🏗 Setup Github Actions to update the image URLs source file
 - [ ] ✨ Avoid downloading image if they already exist
+- [ ] ✨ Add support for all Wayland compositors with [`swaybg`](https://github.com/swaywm/swaybg)
 - [ ] ✨ Add `autoStart` option to enable and start the systemd services
 - [ ] 🧹 Add `autoGC` option to enable images garbage collection
