@@ -19,7 +19,10 @@ Currently supporting:
 
 ```nix
 {
+  # Use unstable to get latest updates
   inputs.earth-view.url = "github:nicolas-goudry/earth-view";
+  # Pin to a given revision
+  #inputs.earth-view.url = "github:nicolas-goudry/earth-view/8c193eeb245cf4b5394f6441d31728775657a80a";
   # Optional, follow your nixpkgs input
   #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -61,7 +64,10 @@ Currently supporting:
 
 ```nix
 {
+  # Use unstable to get latest updates
   inputs.earth-view.url = "github:nicolas-goudry/earth-view";
+  # Pin to a given revision
+  #inputs.earth-view.url = "github:nicolas-goudry/earth-view/8c193eeb245cf4b5394f6441d31728775657a80a";
   # Optional, follow your nixpkgs input
   #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
