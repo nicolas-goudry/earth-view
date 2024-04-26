@@ -17,6 +17,10 @@ let
     ''
       #!${pkgs.bash}/bin/bash
       file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/source.txt) ''${1})
+      if test $? -ne 0; then
+        echo "Error while fetching image"
+        exit 1
+      fi
     ''
   ] ++ optional isGnome ''
     ${pkgs.coreutils}/bin/ln -sf $file /etc/earth-view/current

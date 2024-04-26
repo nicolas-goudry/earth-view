@@ -16,6 +16,10 @@ let
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
     file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 ${cfg.imageDirectory}/source.txt) ''${1})
+    if test $? -ne 0; then
+      echo "Error while fetching image"
+      exit 1
+    fi
     ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri file://$file || true
     ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri-dark file://$file || true
     ${pkgs.feh}/bin/feh ${fehFlags} $file
