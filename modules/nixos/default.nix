@@ -96,7 +96,7 @@ in
         };
       };
 
-      services.xserver.desktopManager.gnome.extraGSettingsOverrides = ''
+      services.xserver.desktopManager.gnome.extraGSettingsOverrides = mkIf isGnome ''
         [org.gnome.desktop.background]
         picture-uri='file:///etc/earth-view/current'
         picture-uri-dark='file:///etc/earth-view/current'
