@@ -8,6 +8,7 @@ import (
   "io/ioutil"
   "net/http"
   "os"
+  "path/filepath"
   "strings"
 )
 
@@ -52,6 +53,35 @@ func decode(content string) ([]byte, error) {
   return decoded, nil
 }
 
+func fileExists(path string) bool {
+  _, err := os.Stat(path)
+  return err == nil
+}
+
+// Function to extract the id from the URL
+func extractId(url string) string {
+  paths := strings.Split(url, "/")
+  basename := paths[len(paths) - 1]
+  idStr := strings.TrimSuffix(basename, ".json")
+
+  return idStr
+}
+
+func writeFile(data []byte, path string) error {
+  file, err := os.Create(path)
+  if err != nil {
+    return err
+  }
+  defer file.Close()
+
+  _, err = file.Write(data)
+  if err != nil {
+    return err
+  }
+
+  return nil
+}
+
 const errorStringFormat = "error: %v\n"
 
 func main() {
@@ -67,6 +97,12 @@ func main() {
 
   url := os.Args[1]
   outDir := os.Args[2]
+  outFile := filepath.Clean(outDir + "/" + extractId(url) + ".jpeg")
+
+  if fileExists(outFile) {
+    fmt.Println(outFile)
+    os.Exit(0)
+  }
 
   body, err := fetch(url)
   if err != nil {
@@ -80,23 +116,13 @@ func main() {
     os.Exit(1)
   }
 
-  id := fmt.Sprint(json["id"])
   dataUri, err := decode(fmt.Sprint(json["dataUri"]))
   if err != nil {
     fmt.Fprintf(os.Stderr, errorStringFormat, err)
     os.Exit(1)
   }
 
-  outFile := outDir + "/" + id + ".jpeg";
-  file, err := os.Create(outFile)
-  if err != nil {
-    fmt.Fprintf(os.Stderr, errorStringFormat, err)
-    os.Exit(1)
-  }
-  defer file.Close()
-
-  _, err = file.Write(dataUri)
-  if err != nil {
+  if err := writeFile(dataUri, outFile); err != nil {
     fmt.Fprintf(os.Stderr, errorStringFormat, err)
     os.Exit(1)
   }
