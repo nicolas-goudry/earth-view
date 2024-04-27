@@ -126,7 +126,7 @@ Currently supporting:
   services.earth-view = {
     enable = true;
     interval = "1h";
-    imageDirectory = "%h/.earth-view"; # Home Manager only
+    imageDirectory = ".earth-view"; # Home Manager only
     display = "fill";
     enableXinerama = true;
   }
@@ -168,7 +168,7 @@ The duration between changing background image. Set to `null` to only set backgr
 
 ### `imageDirectory`
 
-The directory to which background images should be downloaded. Should be [formatted in a way understood by systemd](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers), e.g., `%h` is the home directory.
+The directory to which background images should be downloaded, relative to `$HOME`. `home.homeDirectory` must be set by your Home Manager configuration.
 
 > [!IMPORTANT]
 > This option is only available in the Home Manager module, since with the NixOS module we use systemd via the system manager and therefore cannot access the user home directory.

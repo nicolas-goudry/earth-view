@@ -15,7 +15,9 @@ let
   # TODO: find a way to detect if GNOME is being used as we cannot use config attrset like we do in nixos module
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
-    file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 ${cfg.imageDirectory}/source.txt) ''${1})
+
+    file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 $HOME/$1/.source) $HOME/$1)
+
     if test $? -ne 0; then
       echo "Error while fetching image"
       exit 1
@@ -54,12 +56,11 @@ in
 
       imageDirectory = mkOption {
         type = types.str;
-        default = "%h/.earth-view";
-        example = "%h/backgrounds";
+        default = ".earth-view";
+        example = "backgrounds";
         description = ''
           The directory to which background images should be
-          downloaded. Should be formatted in a way understood by
-          systemd, e.g., '%h' is the home directory.
+          downloaded, relative to HOME.
         '';
       };
 
@@ -94,9 +95,13 @@ in
           assertion = pkgs.stdenv.isLinux;
           message = "services.earth-view is only compatible with Linux systems";
         }
+        {
+          assertion = config.home.homeDirectory != null;
+          message = "'home.homeDirectory' must be defined to the user home directory";
+        }
       ];
 
-      home.file."${cfg.imageDirectory}/source.txt".source = ../../_earthview.txt;
+      home.file."${cfg.imageDirectory}/.source".source = ../../_earthview.txt;
 
       systemd.user.services.earth-view = {
         Unit = {
