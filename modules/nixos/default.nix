@@ -15,6 +15,7 @@ let
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
 
+    mkdir -p $HOME/$1
     file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/.source) $HOME/$1)
 
     if test $? -ne 0; then
