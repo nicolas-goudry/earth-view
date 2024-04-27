@@ -29,6 +29,12 @@ let
       exit 0
     fi
 
+    if test "$XDG_CURRENT_DESKTOP" = "KDE"; then
+      ${pkgs.coreutils}/bin/echo "KDE detected, use plasma-apply-wallpaperimage"
+      ${pkgs.libsForQt5.plasma-workspace}/bin/plasma-apply-wallpaperimage $file
+      exit 0
+    fi
+
     ${pkgs.coreutils}/bin/echo "Could not detect environment, use feh"
     ${pkgs.feh}/bin/feh ${fehFlags} $file
   '';
