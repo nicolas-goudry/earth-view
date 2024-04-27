@@ -16,14 +16,14 @@ let
   startScript = pkgs.writeScriptBin "start-earth-view" (concatStringsSep "\n" ([
     ''
       #!${pkgs.bash}/bin/bash
-      file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/source.txt) ''${1})
+      file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/.source) ''${1})
       if test $? -ne 0; then
         echo "Error while fetching image"
         exit 1
       fi
     ''
   ] ++ optional isGnome ''
-    ${pkgs.coreutils}/bin/ln -sf $file /etc/earth-view/current
+    ${pkgs.coreutils}/bin/ln -sf $file /etc/earth-view/.current
   '' ++ optional (!isGnome) ''
     ${pkgs.feh}/bin/feh ${fehFlags} $file
   ''));
@@ -89,8 +89,8 @@ in
       ];
 
       environment.etc = {
-        "earth-view/source.txt".source = ../../_earthview.txt;
-        "earth-view/current" = {
+        "earth-view/.source".source = ../../_earthview.txt;
+        "earth-view/.current" = {
           text = "";
           mode = "0600";
         };
@@ -98,8 +98,8 @@ in
 
       services.xserver.desktopManager.gnome.extraGSettingsOverrides = mkIf isGnome ''
         [org.gnome.desktop.background]
-        picture-uri='file:///etc/earth-view/current'
-        picture-uri-dark='file:///etc/earth-view/current'
+        picture-uri='file:///etc/earth-view/.current'
+        picture-uri-dark='file:///etc/earth-view/.current'
       '';
 
       systemd.services.earth-view = {
