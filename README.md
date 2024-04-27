@@ -192,7 +192,7 @@ Will place a separate image per screen when enabled, otherwise a single image wi
 
 ### Source of truth
 
-All discovered images URLs from Earth View are saved in [`_earthview.txt`](./_earthview.txt), which is the source of truth of this module.
+All discovered images URLs from Earth View are saved in [`_earthview.txt`](./_earthview.txt), which is the source of truth of this module. This file is linked to a `.source` file in the images directory.
 
 To create this file, we use a small [Go module](./src/scraper/main.go) which scrapes the Earth View static assets in order to find valid images URLs. If you want to use it locally:
 
