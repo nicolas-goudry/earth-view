@@ -101,10 +101,6 @@ in
           assertion = pkgs.stdenv.isLinux;
           message = "services.earth-view is only compatible with Linux systems";
         }
-        {
-          assertion = config.home.homeDirectory != null;
-          message = "'home.homeDirectory' must be defined to the user home directory";
-        }
       ];
 
       home.file."${cfg.imageDirectory}/.source".source = ../../_earthview.txt;
