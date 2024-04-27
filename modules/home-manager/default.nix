@@ -43,9 +43,10 @@ in
           Whether to enable Earth View service.
 
           Note, if you are using NixOS and have set up a custom
-          desktop manager session, then the session configuration must
-          have the `bgSupport` option set to `true` or the background
-          image set by this module may be overwritten.
+          desktop manager session for Home Manager, then the session
+          configuration must have the `bgSupport` option set to `true`
+          or the background image set by this module may be
+          overwritten.
         '';
       };
 
