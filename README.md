@@ -123,9 +123,10 @@ Currently supporting:
 
 ```nix
 {
+  # Default values
   services.earth-view = {
-    enable = true;
-    interval = "1h";
+    enable = false;
+    interval = null;
     imageDirectory = ".earth-view"; # Home Manager only
     display = "fill";
     enableXinerama = true;
