@@ -11,6 +11,23 @@ let
     ([ "--bg-${cfg.display}" "--no-fehbg" ]
       ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
 
+  singleSwayBg = pkgs.writeScriptBin "single-swaybg" ''
+    #!${pkgs.bash}/bin/bash
+
+    pidfile="$1/.swaybg_pid"
+    if ! test -e "$pidfile"; then
+      ${pkgs.coreutils}/bin/echo > $pidfile
+    fi
+    current_pid=$(${pkgs.coreutils}/bin/cat $pidfile)
+
+    ${pkgs.coreutils}/bin/nohup ${pkgs.swaybg}/bin/swaybg -i $2 -m fill & ${pkgs.coreutils}/bin/echo $! > $pidfile
+
+    sleep 3
+    if test -n "$current_pid"; then
+      ${pkgs.coreutils}/bin/kill $current_pid
+    fi
+  '';
+
   # GNOME shell does not use X background (https://github.com/derf/feh/issues/225)
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
@@ -26,6 +43,12 @@ let
       ${pkgs.coreutils}/bin/echo "GNOME detected, use gsettings"
       ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri file://$file
       ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri-dark file://$file
+      exit 0
+    fi
+
+    if test "$XDG_SESSION_TYPE" = "wayland"; then
+      ${pkgs.coreutils}/bin/echo "Wayland detected, use swaybg"
+      ${singleSwayBg}/bin/single-swaybg $HOME/$1 $file
       exit 0
     fi
 
