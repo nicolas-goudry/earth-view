@@ -12,18 +12,24 @@ let
       ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
 
   # GNOME shell does not use X background (https://github.com/derf/feh/issues/225)
-  # TODO: find a way to detect if GNOME is being used as we cannot use config attrset like we do in nixos module
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
 
     file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 $HOME/$1/.source) $HOME/$1)
 
     if test $? -ne 0; then
-      echo "Error while fetching image"
+      ${pkgs.coreutils}/bin/echo "Error while fetching image"
       exit 1
     fi
-    ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri file://$file || true
-    ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri-dark file://$file || true
+
+    if test "$XDG_CURRENT_DESKTOP" = "GNOME"; then
+      ${pkgs.coreutils}/bin/echo "GNOME detected, use gsettings"
+      ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri file://$file
+      ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri-dark file://$file
+      exit 0
+    fi
+
+    ${pkgs.coreutils}/bin/echo "Could not detect environment, use feh"
     ${pkgs.feh}/bin/feh ${fehFlags} $file
   '';
 in

@@ -7,7 +7,7 @@ Randomly set desktop background from 2000+ images sourced from [Google Earth Vie
 Currently supporting:
 
 - X desktops
-- GNOME on wayland or X11
+- GNOME on Wayland or X11
 
 > Wayland compositors support will come soon. [Track issue](https://github.com/nicolas-goudry/earth-view/issues/2).
 
@@ -230,13 +230,24 @@ These services execute a Bash script which uses the Go module described in the p
 
 ### Some background
 
-Setting the background is handled differently by NixOS and Home Manager modules. However, both use [`feh`](https://github.com/derf/feh) and/or `gsettings` to apply the background.
+Setting the background is handled differently by NixOS and Home Manager modules and also depends on the desktop manager used. The programs used by the module are the following:
 
-Why not only use `feh` would you ask? Well, as of today it does not support setting the GNOME background image. [And it may not ever support it](https://github.com/derf/feh/issues/225).
+- GNOME on Wayland or X11: `gsettings`
+- X: [`feh`](https://github.com/derf/feh)
 
-For Home Manager, we nag it and use **both [`feh`](https://github.com/derf/feh) and `gsettings`** to set the background. Unlike with the NixOS module, there is no clear way to tell if the current desktop manager is GNOME, so by using both methods we are pretty sure that the background will be set. <sub><sup>No, we cannot use `$XDG_CURRENT_DESKTOP`, `loginctl` or any other “classic” mean since we are running systemd.</sup></sub>
+Why not only use `feh`, would you ask? Well, as of today it does not support setting the GNOME background image. [And it may not ever support it](https://github.com/derf/feh/issues/225). It seems that it also does not work with KDE. And obviously it does not work with Wayland compositors.
 
-For NixOS and GNOME, things are a little bit hacky. But it works™️. We must deal with `systemd` being run as `root` as well as NixOS immutability:
+#### Home Manager
+
+We detect the current desktop environment with the `XDG_CURRENT_DESKTOP` environment variable and set the background with the right program. If we cannot detect the desktop we rely on `feh`.
+
+#### NixOS
+
+**GNOME:**
+
+Things are a little bit hacky, but it works™️.
+
+We must deal with `systemd` being run as `root` as well as NixOS immutability:
 
 - we cannot use `gsettings` as it will not have any effect on the current user configuration
 - we cannot interact directly with `dconf`, neither via the command line nor by messing with `/etc/dconf/db/local.d`
@@ -247,7 +258,9 @@ Instead, the module does the following:
 - define `extraGSettingsOverrides` to set the GNOME background to this file
 - force link the background image to this file
 
-For NixOS and non-GNOME desktops, only `feh` is used.
+**Other desktops:**
+
+Only `feh` is used.
 
 ## 🎩 Acknowledgments
 
