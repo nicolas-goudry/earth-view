@@ -90,7 +90,7 @@ in
 
       environment.etc = {
         "earth-view/.source".source = ../../_earthview.txt;
-        "earth-view/.current" = {
+        "earth-view/.current" = mkIf isGnome {
           text = "";
           mode = "0600";
         };
