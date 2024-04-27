@@ -6,27 +6,38 @@ let
   inherit ((pkgs.callPackage ../.. { inherit pkgs; })) ev-fetcher;
 
   cfg = config.services.earth-view;
-  isGnome = config.services.xserver.desktopManager.gnome.enable;
 
   fehFlags = lib.concatStringsSep " "
     ([ "--bg-${cfg.display}" "--no-fehbg" ]
       ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
 
   # GNOME shell does not use X background (https://github.com/derf/feh/issues/225)
-  startScript = pkgs.writeScriptBin "start-earth-view" (concatStringsSep "\n" ([
-    ''
-      #!${pkgs.bash}/bin/bash
-      file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/.source) ''${1})
-      if test $? -ne 0; then
-        echo "Error while fetching image"
-        exit 1
-      fi
-    ''
-  ] ++ optional isGnome ''
-    ${pkgs.coreutils}/bin/ln -sf $file /etc/earth-view/.current
-  '' ++ optional (!isGnome) ''
+  startScript = pkgs.writeScriptBin "start-earth-view" ''
+    #!${pkgs.bash}/bin/bash
+
+    file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/.source) $HOME/$1)
+
+    if test $? -ne 0; then
+      ${pkgs.coreutils}/bin/echo "Error while fetching image"
+      exit 1
+    fi
+
+    if test "$XDG_CURRENT_DESKTOP" = "GNOME"; then
+      ${pkgs.coreutils}/bin/echo "GNOME detected, use gsettings"
+      ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri file://$file
+      ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri-dark file://$file
+      exit 0
+    fi
+
+    if test "$XDG_CURRENT_DESKTOP" = "KDE"; then
+      ${pkgs.coreutils}/bin/echo "KDE detected, use plasma-apply-wallpaperimage"
+      ${pkgs.libsForQt5.plasma-workspace}/bin/plasma-apply-wallpaperimage $file
+      exit 0
+    fi
+
+    ${pkgs.coreutils}/bin/echo "Could not detect environment, use feh"
     ${pkgs.feh}/bin/feh ${fehFlags} $file
-  ''));
+  '';
 in
 {
   meta.maintainers = [ maintainers.nicolas-goudry ];
@@ -37,10 +48,10 @@ in
         description = ''
           Whether to enable Earth View service.
 
-          Note, if you are using NixOS and have set up a custom
-          desktop manager session, then the session configuration must
-          have the `bgSupport` option set to `true` or the background
-          image set by this module may be overwritten.
+          Note, if you have set up a custom desktop manager session,
+          then the session configuration must have the `bgSupport`
+          option set to `true` or the background image set by this
+          module may be overwritten.
         '';
       };
 
@@ -52,6 +63,16 @@ in
           The duration between changing background image. Set to
           `null` to only set background when logging in. Should be
           formatted as a duration understood by systemd.
+        '';
+      };
+
+      imageDirectory = mkOption {
+        type = types.str;
+        default = ".earth-view";
+        example = "backgrounds";
+        description = ''
+          The directory to which background images should be
+          downloaded, relative to HOME.
         '';
       };
 
@@ -88,21 +109,9 @@ in
         }
       ];
 
-      environment.etc = {
-        "earth-view/.source".source = ../../_earthview.txt;
-        "earth-view/.current" = mkIf isGnome {
-          text = "";
-          mode = "0600";
-        };
-      };
+      environment.etc."earth-view/.source".source = ../../_earthview.txt;
 
-      services.xserver.desktopManager.gnome.extraGSettingsOverrides = mkIf isGnome ''
-        [org.gnome.desktop.background]
-        picture-uri='file:///etc/earth-view/.current'
-        picture-uri-dark='file:///etc/earth-view/.current'
-      '';
-
-      systemd.services.earth-view = {
+      systemd.user.services.earth-view = {
         unitConfig = {
           Description = "Set random desktop background from Earth View";
           After = [ "graphical-session-pre.target" ];
@@ -112,14 +121,14 @@ in
         serviceConfig = {
           Type = "oneshot";
           IOSchedulingClass = "idle";
-          ExecStart = "${startScript}/bin/start-earth-view %E/earth-view";
+          ExecStart = "${startScript}/bin/start-earth-view ${cfg.imageDirectory}";
         };
 
         wantedBy = [ "graphical-session.target" ];
       };
     }
     (mkIf (cfg.interval != null) {
-      systemd.timers.earth-view = {
+      systemd.user.timers.earth-view = {
         unitConfig = { Description = "Set random desktop background from Earth View"; };
         timerConfig = { OnUnitActiveSec = cfg.interval; };
         wantedBy = [ "timers.target" ];
