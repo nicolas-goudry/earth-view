@@ -139,11 +139,9 @@ Currently supporting:
 >
 > ```shell
 > # NixOS module
-> sudo systemctl start earth-view.service
 > sudo systemctl start earth-view.timer
 >
 > # Home Manager module
-> systemctl --user start eath-view.service
 > systemctl --user start eath-view.timer
 > ```
 
