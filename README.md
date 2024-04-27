@@ -228,3 +228,4 @@ Last but not least, this would not be possible without the great [Google Earth V
 - [ ] ✨ Add support for all Wayland compositors with [`swaybg`](https://github.com/swaywm/swaybg)
 - [ ] ✨ Add `autoStart` option to enable and start the systemd services
 - [ ] 🧹 Add `autoGC` option to enable images garbage collection
+- [ ] 📡 Make sure network is up to avoid image download failure
