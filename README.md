@@ -8,8 +8,9 @@ Currently supporting:
 
 - X desktops
 - GNOME on Wayland or X11
+- KDE on Wayland or X11
 
-> Wayland compositors support will come soon. [Track issue](https://github.com/nicolas-goudry/earth-view/issues/2).
+> Wayland compositors support will come soon.
 
 ## 📥 Installation
 
@@ -127,7 +128,7 @@ Currently supporting:
   services.earth-view = {
     enable = false;
     interval = null;
-    imageDirectory = ".earth-view"; # Home Manager only
+    imageDirectory = ".earth-view";
     display = "fill";
     enableXinerama = true;
   }
@@ -135,25 +136,11 @@ Currently supporting:
 ```
 
 > [!TIP]
-> Currently, the systemd service is not automatically started. To manually start it, you can use the following commands after applying your configuration:
+> Currently, the systemd service is not automatically started. To manually start it, you can use the following command after applying your configuration:
 >
 > ```shell
-> # NixOS module
-> sudo systemctl start earth-view.timer
->
-> # Home Manager module
 > systemctl --user start eath-view.timer
 > ```
-
-> [!WARNING]
-> When using the NixOS module with GNOME and a custom background image was already set, you have to reset it in order for the service to work:
->
-> ```shell
-> gsettings reset org.gnome.desktop.background picture-uri
-> gsettings reset org.gnome.desktop.background picture-uri-dark
-> ```
->
-> You may also have to logout and login again to see the background applied.
 
 ### `enable`
 
@@ -167,32 +154,27 @@ The duration between changing background image. Set to `null` to only set backgr
 
 ### `imageDirectory`
 
-The directory to which background images should be downloaded, relative to `$HOME`. `home.homeDirectory` must be set by your Home Manager configuration.
-
-> [!IMPORTANT]
-> This option is only available in the Home Manager module, since with the NixOS module we use systemd via the system manager and therefore cannot access the user home directory.
->
-> Images will be stored in `/etc/earth-view`.
+The directory to which background images should be downloaded, relative to `$HOME`.
 
 ### `display`
 
 Display background images according to this option. See [`feh` documentation](https://man.archlinux.org/man/feh.1.en#BACKGROUND_SETTING) for details.
 
 > [!NOTE]
-> This option has no effect on GNOME shell desktops.
+> This option has no effect neither on GNOME nor KDE.
 
 ### `enableXinerama`
 
 Will place a separate image per screen when enabled, otherwise a single image will be stretched across all screens.
 
 > [!NOTE]
-> This option has no effect on GNOME shell desktops.
+> This option has no effect neither on GNOME nor KDE.
 
 ## 🧐 How it works
 
 ### Source of truth
 
-All discovered images URLs from Earth View are saved in [`_earthview.txt`](./_earthview.txt), which is the source of truth of this module. This file is linked to a `.source` file in the images directory.
+All discovered images URLs from Earth View are saved in [`_earthview.txt`](./_earthview.txt), which is the source of truth of this module.
 
 To create this file, we use a small [Go module](./src/scraper/main.go) which scrapes the Earth View static assets in order to find valid images URLs. If you want to use it locally:
 
@@ -214,52 +196,23 @@ nix build '.#ev-scraper' # ...or nix-build -A ev-scraper
 
 ### Image selection
 
-To select an image, a random line from the source of truth is read and a [Go module](./src/fetcher/main.go) is used to download it and save it to a given location. The need for a Go module comes from the fact that Earth View exposes images as JSON object with a `dataUri` key containing the base64 encoded image. It also contribute to reduce Bash usage.
-
-The images are downloaded at different locations given the module used:
-
-- for NixOS, the path is `/etc/earth-view`, it is not configurable
-- for Home Manager, the path defined by the `imageDirectory` option is used
+To select an image, a random line from the source of truth is read and a [Go module](./src/fetcher/main.go) is used to download it and save it to the `imageDirectory` directory. The need for a Go module comes from the fact that Earth View exposes images as JSON object with a `dataUri` key containing the base64 encoded image. It also contribute to reduce Bash usage.
 
 ### systemd
 
-Both modules use a systemd unit, along with a timer when `interval` is specified. The NixOS module uses a system-wide service, while the Home Manager module uses a user-managed service.
+Both modules use a systemd user-managed unit, along with a timer when `interval` is specified.
 
-These services execute a Bash script which uses the Go module described in the previous section to fetch the image and then set the desktop background accordingly. Read further for more details.
+The service executes a Bash script which uses the Go module described in the previous section to fetch the image and then set the desktop background accordingly. Read further for more details.
 
 ### Some background
 
-Setting the background is handled differently by NixOS and Home Manager modules and also depends on the desktop manager used. The programs used by the module are the following:
+Setting the background depends on the desktop manager in use. We detect the current desktop environment with the `XDG_CURRENT_DESKTOP` environment variable and set the background with the right program:
 
 - GNOME on Wayland or X11: `gsettings`
+- KDE on Wayland or X11: `plasma-apply-wallpaperimage`
 - X: [`feh`](https://github.com/derf/feh)
 
 Why not only use `feh`, would you ask? Well, as of today it does not support setting the GNOME background image. [And it may not ever support it](https://github.com/derf/feh/issues/225). It seems that it also does not work with KDE. And obviously it does not work with Wayland compositors.
-
-#### Home Manager
-
-We detect the current desktop environment with the `XDG_CURRENT_DESKTOP` environment variable and set the background with the right program. If we cannot detect the desktop we rely on `feh`.
-
-#### NixOS
-
-**GNOME:**
-
-Things are a little bit hacky, but it works™️.
-
-We must deal with `systemd` being run as `root` as well as NixOS immutability:
-
-- we cannot use `gsettings` as it will not have any effect on the current user configuration
-- we cannot interact directly with `dconf`, neither via the command line nor by messing with `/etc/dconf/db/local.d`
-
-Instead, the module does the following:
-
-- write a dummy file at `/etc/earth-view/current`
-- define `extraGSettingsOverrides` to set the GNOME background to this file
-- force link the background image to this file
-
-**Other desktops:**
-
-Only `feh` is used.
 
 ## 🎩 Acknowledgments
 
@@ -271,7 +224,6 @@ Last but not least, this would not be possible without the great [Google Earth V
 
 ## 📝 TODO
 
-- [ ] 🏠 Find a way to detect if GNOME is being used as we cannot use config attrset [like we do in NixOS module](./modules/nixos/default.nix#L9)
 - [ ] 🏗 Setup Github Actions to update the image URLs source file
 - [ ] ✨ Add support for all Wayland compositors with [`swaybg`](https://github.com/swaywm/swaybg)
 - [ ] ✨ Add `autoStart` option to enable and start the systemd services
