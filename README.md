@@ -1,6 +1,7 @@
 # 🌎 earth-view
 
-![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge)
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge
+)](https://flakehub.com/flake/nicolas-goudry/earth-view)
 
 Randomly set desktop background from 2000+ images sourced from [Google Earth View](https://earthview.withgoogle.com).
 
@@ -22,8 +23,10 @@ Currently supporting:
 {
   # Use unstable to get latest updates
   inputs.earth-view.url = "github:nicolas-goudry/earth-view";
-  # Pin to a given revision
-  #inputs.earth-view.url = "github:nicolas-goudry/earth-view/8c193eeb245cf4b5394f6441d31728775657a80a";
+  # Pin to a given version
+  #inputs.earth-view.url = "github:nicolas-goudry/earth-view/v1.4.1";
+  # Use FlakeHub
+  #inputs.earth-view.url = "https://flakehub.com/f/nicolas-goudry/earth-view/*.tar.gz";
   # Optional, follow your nixpkgs input
   #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -67,8 +70,10 @@ Currently supporting:
 {
   # Use unstable to get latest updates
   inputs.earth-view.url = "github:nicolas-goudry/earth-view";
-  # Pin to a given revision
-  #inputs.earth-view.url = "github:nicolas-goudry/earth-view/8c193eeb245cf4b5394f6441d31728775657a80a";
+  # Pin to a given version
+  #inputs.earth-view.url = "github:nicolas-goudry/earth-view/v1.4.1";
+  # Use FlakeHub
+  #inputs.earth-view.url = "https://flakehub.com/f/nicolas-goudry/earth-view/*.tar.gz";
   # Optional, follow your nixpkgs input
   #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
