@@ -139,8 +139,14 @@ Currently supporting:
 > Currently, the systemd service is not automatically started. To manually start it, you can use the following command after applying your configuration:
 >
 > ```shell
-> systemctl --user start eath-view.timer
+> systemctl --user start earth-view.timer
 > ```
+>
+> If that does not work or you would like to manually switch the background you can start/restart the main service:
+> ```shell
+> systemctl --user start earth-view
+> ```
+>
 
 ### `enable`
 
