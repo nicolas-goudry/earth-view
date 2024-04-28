@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.2 - 28/04/2024
+
+🐞 **Bug Fixes**
+
+- 📦 Downgrade Go to v1.21.9 (NixOS 23.11 compatibility)
+
 ## v1.4.1 - 27/04/2024
 
 🐞 **Bug Fixes**
