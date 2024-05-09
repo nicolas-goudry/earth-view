@@ -22,7 +22,7 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems f;
     in
     {
-      homeManagerModule = import ./modules/home-manager;
+      homeManagerModules.earth-view = import ./modules/home-manager;
       nixosModules = {
         earth-view = import ./modules/nixos;
         default = self.nixosModules.earth-view;
