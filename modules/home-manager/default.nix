@@ -1,13 +1,11 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   inherit ((pkgs.callPackage ../.. { inherit pkgs; })) ev-fetcher;
 
   cfg = config.services.earth-view;
 
-  fehFlags = concatStringsSep " "
+  fehFlags = lib.concatStringsSep " "
     ([ "--bg-${cfg.display}" "--no-fehbg" ]
       ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
 
@@ -40,11 +38,11 @@ let
   '';
 in
 {
-  meta.maintainers = [ maintainers.nicolas-goudry ];
+  meta.maintainers = [ lib.maintainers.nicolas-goudry ];
 
   options = {
     services.earth-view = {
-      enable = mkEnableOption "" // {
+      enable = lib.mkEnableOption "" // {
         description = ''
           Whether to enable Earth View service.
 
@@ -56,8 +54,8 @@ in
         '';
       };
 
-      interval = mkOption {
-        type = types.nullOr types.str;
+      interval = lib.mkOption {
+        type = with lib.types; nullOr str;
         default = null;
         example = "1h";
         description = ''
@@ -67,8 +65,8 @@ in
         '';
       };
 
-      imageDirectory = mkOption {
-        type = types.str;
+      imageDirectory = lib.mkOption {
+        type = lib.types.str;
         default = ".earth-view";
         example = "backgrounds";
         description = ''
@@ -77,8 +75,8 @@ in
         '';
       };
 
-      display = mkOption {
-        type = types.enum [ "center" "fill" "max" "scale" "tile" ];
+      display = lib.mkOption {
+        type = lib.types.enum [ "center" "fill" "max" "scale" "tile" ];
         default = "fill";
         description = ''
           Display background images according to this option.
@@ -87,8 +85,8 @@ in
         '';
       };
 
-      enableXinerama = mkOption {
-        type = types.bool;
+      enableXinerama = lib.mkOption {
+        type = lib.types.bool;
         default = true;
         description = ''
           Will place a separate image per screen when enabled,
@@ -101,7 +99,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
+  config = lib.mkIf cfg.enable (lib.mkMerge [
     {
       assertions = [
         {
@@ -128,7 +126,7 @@ in
         Install = { WantedBy = [ "graphical-session.target" ]; };
       };
     }
-    (mkIf (cfg.interval != null) {
+    (lib.mkIf (cfg.interval != null) {
       systemd.user.timers.earth-view = {
         Unit = { Description = "Set random desktop background from Earth View"; };
         Timer = { OnUnitActiveSec = cfg.interval; };
