@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit ((pkgs.callPackage ../.. { inherit pkgs; })) ev-fetcher;
+  inherit ((pkgs.callPackage ../.. { inherit pkgs; })) earth-view;
 
   cfg = config.services.earth-view;
 
@@ -14,7 +14,7 @@ let
     #!${pkgs.bash}/bin/bash
 
     mkdir -p $HOME/$1
-    file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/.source) $HOME/$1)
+    file=$(${earth-view}/bin/earth-view fetch random -i /etc/earth-view/.source -o $HOME/$1)
 
     if test $? -ne 0; then
       ${pkgs.coreutils}/bin/echo "Error while fetching image"
