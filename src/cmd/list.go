@@ -54,7 +54,8 @@ Description:
   the image is skipped.
 
   By default, the generated list is output to the standard output. This
-  behaviour can be changed by using the '--output' flag.`,
+  behaviour can be changed by using the '--output' flag. If the provided value
+  is a directory, the file will be named 'earth-view.json'.`,
     DisableFlagsInUseLine: true,
     SilenceUsage: true,
     Args: cobra.MaximumNArgs(0),
@@ -66,7 +67,7 @@ Description:
       if output == "" {
         fmt.Println(string(json))
       } else {
-        outPath, err := lib.WriteFile(json, output)
+        outPath, err := lib.WriteFile(json, output, "earth-view.json")
         cobra.CheckErr(err)
 
         fmt.Printf("List is available at %s\n", outPath)

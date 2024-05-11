@@ -36,7 +36,8 @@ var (
   images assets, then the image is decoded before being saved on the filesystem.`,
     output: `  By default, the image is saved in the current working directory and its
   identifier is used as the filename. This behaviour can be changed by using the
-  '--output' flag.`,
+  '--output' flag. If the provided value is a directory, the file is saved into
+  it and its identifier is used as the filename.`,
   }
 )
 

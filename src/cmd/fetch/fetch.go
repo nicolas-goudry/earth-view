@@ -58,13 +58,9 @@ Description:
     },
     Run: func(cmd *cobra.Command, args []string) {
       assetContent, err := fetchAssetContent(idNumeric)
+      defaultFilename := args[0] + ".jpeg"
       cobra.CheckErr(err)
-
-      if output == "" {
-        output = args[0] + ".jpeg"
-      }
-
-      outFile, err := lib.WriteFile(assetContent, output)
+      outFile, err := lib.WriteFile(assetContent, output, defaultFilename)
       cobra.CheckErr(err)
       fmt.Println(outFile)
     },

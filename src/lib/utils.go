@@ -23,6 +23,7 @@ package lib
 
 import (
   "os"
+  "path"
   "path/filepath"
 )
 
@@ -40,12 +41,21 @@ func IsPathValid(path string) bool {
   return false
 }
 
-func WriteFile(content []byte, path string) (string, error) {
-  if err := os.WriteFile(path, content, 0644); err != nil {
+func WriteFile(content []byte, outPath string, defaultFilename string) (string, error) {
+  stat, err := os.Stat(outPath)
+  if err != nil {
     return "", err
   }
 
-  finalPath, err := filepath.Abs(path)
+  if stat.IsDir() {
+    outPath = path.Join(outPath, defaultFilename)
+  }
+
+  if err := os.WriteFile(outPath, content, 0644); err != nil {
+    return "", err
+  }
+
+  finalPath, err := filepath.Abs(outPath)
   if err != nil {
     return "", err
   }
