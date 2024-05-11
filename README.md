@@ -185,29 +185,30 @@ Will place a separate image per screen when enabled, otherwise a single image wi
 
 ### Source of truth
 
-All discovered images URLs from Earth View are saved in [`_earthview.txt`](./_earthview.txt), which is the source of truth of this module.
+All discovered images URLs from Earth View are saved in [`earth-view.json`](./earth-view.json), which is the source of truth of this Nix module.
 
-To create this file, we use a small [Go module](./src/scraper/main.go) which scrapes the Earth View static assets in order to find valid images URLs. If you want to use it locally:
+To create this file, we use a [custom CLI application](./src/main.go) written in Go which provides commands to list and download images from Google Earth View. In particular, we use the `list` command which scrapes the Earth View static assets in order to find valid identifiers for images. If you want to use the CLI locally:
 
 ```shell
-# Use go
-go run ./scraper
+# Use go (go must be available in your path! Hint: nix shell 'nixpkgs#go_1_22')
+cd src
+go run .
 
 # Use a devshell
 nix develop # ...or nix-shell
-ev-scraper
+earth-view
 
 # Run via nix
-nix run '.#ev-scraper'
+nix run '.#earth-view'
 
 # Build it
-nix build '.#ev-scraper' # ...or nix-build -A ev-scraper
-./result/bin/ev-scraper
+nix build '.#earth-view' # ...or nix-build -A earth-view
+./result/bin/earth-view
 ```
 
 ### Image selection
 
-To select an image, a random line from the source of truth is read and a [Go module](./src/fetcher/main.go) is used to download it and save it to the `imageDirectory` directory. The need for a Go module comes from the fact that Earth View exposes images as JSON object with a `dataUri` key containing the base64 encoded image. It also contribute to reduce Bash usage.
+To select an image, the `fetch random` command is used to select a random image identifier from the source of truth, download it and save it to the `imageDirectory` directory.
 
 ### systemd
 
