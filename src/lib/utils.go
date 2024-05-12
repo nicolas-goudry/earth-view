@@ -43,12 +43,10 @@ func IsPathValid(path string) bool {
 
 func WriteFile(content []byte, outPath string, defaultFilename string) (string, error) {
   stat, err := os.Stat(outPath)
-  if err != nil {
-    return "", err
-  }
-
-  if stat.IsDir() {
-    outPath = path.Join(outPath, defaultFilename)
+  if err == nil {
+    if stat.IsDir() {
+      outPath = path.Join(outPath, defaultFilename)
+    }
   }
 
   if err := os.WriteFile(outPath, content, 0644); err != nil {
