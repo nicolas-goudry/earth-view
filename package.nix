@@ -4,7 +4,7 @@ buildGoModule rec {
   pname = "earth-view";
   version = "1.0.0";
   src = ./src;
-  vendorHash = "sha256-eKeUhS2puz6ALb+cQKl7+DGvm9Cl+miZAHX0imf9wdg=";
+  vendorHash = "sha256-kiYMJXsrRJxU2P6mxFtt0kZd5qu1Qbd3uIXjXFUyjZA=";
 
   meta = {
     description = "List and download Google Earth View images";
