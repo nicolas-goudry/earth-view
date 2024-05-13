@@ -26,6 +26,7 @@ import (
   "fmt"
   "os"
   "sort"
+  "strings"
   "sync"
 
   "earth-view/lib"
@@ -82,9 +83,6 @@ func (f *fetcher) Start() {
     for result := range chunkCh {
       chunkResults = append(chunkResults, result)
       results = append(results, result)
-      if result.error != nil {
-        f.errors = append(f.errors, result.error)
-      }
     }
 
     f.onFetchProgress(fetchProgress{
@@ -96,6 +94,8 @@ func (f *fetcher) Start() {
   for _, result := range results {
     if result.error == nil {
       f.results = append(f.results, result.id)
+    } else if ! strings.Contains(result.error.Error(), "not found") {
+      f.errors = append(f.errors, result.error)
     }
   }
 
