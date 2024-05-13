@@ -140,7 +140,7 @@ func main() {
   go f.Start()
 
   if _, err := program.Run(); err != nil {
-    fmt.Println("error running program:", err)
+    fmt.Fprintf(os.Stderr, "error running program: %v\n", err)
     os.Exit(1)
   }
 
@@ -148,7 +148,7 @@ func main() {
     json, err := generateJSONContent(f.results)
     if err != nil {
       if quiet == false {
-        fmt.Println(err)
+        fmt.Fprintln(os.Stderr, err)
       }
 
       os.Exit(1)
@@ -160,7 +160,7 @@ func main() {
       outPath, err := lib.WriteFile(json, output, "earth-view.json")
       if err != nil {
         if quiet == false {
-          fmt.Println(err)
+          fmt.Fprintln(os.Stderr, err)
         }
 
         os.Exit(1)
