@@ -9,7 +9,6 @@ let
     ([ "--bg-${cfg.display}" "--no-fehbg" ]
       ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
 
-  # GNOME shell does not use X background (https://github.com/derf/feh/issues/225)
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
 
@@ -108,7 +107,7 @@ in
         }
       ];
 
-      home.file."${cfg.imageDirectory}/.source".source = ../../_earthview.txt;
+      home.file."${cfg.imageDirectory}/.source".source = ../../earth-view.json;
 
       systemd.user.services.earth-view = {
         Unit = {
