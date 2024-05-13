@@ -27,20 +27,6 @@ import (
   "path/filepath"
 )
 
-func IsPathValid(path string) bool {
-  if _, err := os.Stat(path); err == nil {
-    return true
-  }
-
-  var d []byte
-  if err := os.WriteFile(path, d, 0644); err == nil {
-    os.Remove(path)
-    return true
-  }
-
-  return false
-}
-
 func WriteFile(content []byte, outPath string, defaultFilename string) (string, error) {
   if stat, err := os.Stat(outPath); err == nil {
     if stat.IsDir() {
