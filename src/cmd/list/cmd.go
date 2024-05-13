@@ -19,24 +19,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package cmd
+package list
 
 import (
-  "encoding/json"
   "fmt"
-  "os"
-  "sort"
-  "strings"
-  "sync"
 
-  "earth-view/lib"
+  "earth-view/cmd"
 	"github.com/spf13/cobra"
 )
 
 var (
   batchSize int
-  retry     int
   output    string
+  quiet     bool
+  retry     int
 
   listCmd = &cobra.Command{
     Use:   "list",
@@ -59,95 +55,25 @@ Description:
     DisableFlagsInUseLine: true,
     SilenceUsage: true,
     Args: cobra.MaximumNArgs(0),
-    Run: func(_ *cobra.Command, _ []string) {
-      assets := fetchAssets()
-      json, err := generateJSONContent(assets)
-      cobra.CheckErr(err)
-
-      if output == "" {
-        fmt.Println(string(json))
-      } else {
-        outPath, err := lib.WriteFile(json, output, "earth-view.json")
-        cobra.CheckErr(err)
-
-        fmt.Printf("List is available at %s\n", outPath)
+    PreRunE: func(_ *cobra.Command, _ []string) error {
+      if output == "" && quiet {
+        return fmt.Errorf("--quiet cannot be provided when --output is not set")
       }
+
+      return nil
+    },
+    Run: func(_ *cobra.Command, _ []string) {
+      main()
     },
   }
 )
 
 func init() {
-	RootCmd.AddCommand(listCmd)
+	cmd.RootCmd.AddCommand(listCmd)
 
 	listCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 20, `number of parallel calls to gstatic.com
 Using a high value may result in potentially wrong failures to fetch images`)
-  listCmd.Flags().IntVarP(&retry, "retry", "r", 3, "number of retries before skipping an image in case of non 200 HTTP status code")
   listCmd.Flags().StringVarP(&output, "output", "o", "", "write to file instead of stdout")
-}
-
-func generateJSONContent(assets []lib.Asset) ([]byte, error) {
-  var content []int
-  for _, asset := range assets {
-    content = append(content, asset.Id)
-  }
-
-  sort.Slice(content, func(i, j int) bool {
-    return content[i] < content[j]
-  })
-
-  json, err := json.Marshal(content)
-  if err != nil {
-    return nil, err
-  }
-
-  return json, nil
-}
-
-func fetchAssets() []lib.Asset {
-  var wg sync.WaitGroup
-  ch := make(chan lib.Asset, lib.KnownIdUpperBoundary - lib.KnownIdLowerBoundary)
-
-  for i := lib.KnownIdLowerBoundary; i < lib.KnownIdUpperBoundary; i += batchSize {
-    chunkEnd := i + batchSize
-    if chunkEnd > lib.KnownIdUpperBoundary {
-      chunkEnd = lib.KnownIdUpperBoundary
-    }
-
-    chunk := make([]int, batchSize)
-    for j := 0; j < batchSize; j++ {
-      chunk[j] = i + j
-    }
-
-    wg.Add(1)
-    go fetchChunk(chunk, &wg, ch)
-  }
-
-  go func() {
-    wg.Wait()
-    close(ch)
-  }()
-
-  assets := make([]lib.Asset, len(ch))
-  for asset := range ch {
-    assets = append(assets, asset)
-  }
-
-  return assets
-}
-
-func fetchChunk(chunk []int, wg *sync.WaitGroup, ch chan<- lib.Asset) {
-  defer wg.Done()
-
-  for _, id := range chunk {
-    asset := lib.Asset{ Id: id }
-    if err := asset.Fetch(retry); err != nil {
-      if ! strings.Contains(err.Error(), "not found") {
-        fmt.Fprintln(os.Stderr, err)
-      }
-
-      continue
-    }
-
-    ch <- asset
-  }
+  listCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "do not output anything")
+  listCmd.Flags().IntVarP(&retry, "retry", "r", 3, "number of retries before skipping an image in case of non 200 HTTP status code")
 }

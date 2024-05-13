@@ -24,6 +24,7 @@ package main
 import (
   "earth-view/cmd"
   _ "earth-view/cmd/fetch"
+  _ "earth-view/cmd/list"
 )
 
 func main() {
