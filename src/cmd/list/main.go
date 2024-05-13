@@ -145,6 +145,15 @@ func main() {
   }
 
   if f.done == true {
+    if len(f.errors) > 0 && quiet == false {
+      fmt.Fprintln(os.Stderr, "Encountered the following errors:")
+
+      for _, err := range f.errors {
+        fmt.Fprintf(os.Stderr, "  %v\n", err)
+      }
+      fmt.Fprintln(os.Stderr, "")
+    }
+
     json, err := generateJSONContent(f.results)
     if err != nil {
       if quiet == false {
