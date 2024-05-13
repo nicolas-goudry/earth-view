@@ -50,9 +50,3 @@ func Execute() {
 		os.Exit(1)
 	}
 }
-
-var Verbose bool
-
-func init() {
-	RootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "enable verbose output")
-}
