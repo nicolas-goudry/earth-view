@@ -61,13 +61,16 @@ Description:
     Args: cobra.MaximumNArgs(0),
     Run: func(cmd *cobra.Command, args []string) {
       asset := lib.Asset{}
-      fetchRandomAsset(&asset)
-
-      defaultFilename := strconv.Itoa(asset.Id) + ".jpeg"
-      outFile, err := lib.WriteFile(asset.Content, output, defaultFilename)
+      filePath, err := fetchRandomAsset(&asset)
       cobra.CheckErr(err)
 
-      fmt.Println(outFile)
+      // Only write file if it does not yet exist or if overwrite is set
+      if lib.FileExists(filePath) == false || overwrite {
+        err := lib.WriteFile(asset.Content, filePath)
+        cobra.CheckErr(err)
+      }
+
+      fmt.Println(filePath)
     },
   }
 )
@@ -76,27 +79,42 @@ func init() {
 	fetchCmd.AddCommand(randomCmd)
 
   randomCmd.Flags().StringVarP(&input, "input", "i", "", "input file to choose an image from, or standard input if not specified")
-  addOutputFlag(randomCmd.Flags())
+  addCommonFlags(randomCmd.Flags())
 }
 
-func fetchRandomAsset(asset *lib.Asset) error {
+func pickRandomId() (int, error) {
   if input == "" {
-    asset.Id = lib.KnownIdLowerBoundary + rand.Intn(lib.KnownIdUpperBoundary - lib.KnownIdLowerBoundary + 1)
-  } else {
-    ids, err := readInput()
-    if err != nil {
-      return err
+    return lib.KnownIdLowerBoundary + rand.Intn(lib.KnownIdUpperBoundary - lib.KnownIdLowerBoundary + 1), nil
+  }
+
+  ids, err := readInput()
+  if err != nil {
+    return -1, err
+  }
+
+  return ids[rand.Intn(len(ids))], nil
+}
+
+func fetchRandomAsset(asset *lib.Asset) (string, error) {
+  randomId, err := pickRandomId()
+  if err != nil {
+    return "", err
+  }
+
+  filePath, err := lib.ResolveAbsFilePath(output, strconv.Itoa(randomId) + ".jpeg")
+  if err != nil {
+    return "", err
+  }
+
+  // Only fetch file if it does not yet exist or if overwrite is set
+  if lib.FileExists(filePath) == false || overwrite {
+    asset.Id = randomId
+    if _, err := asset.GetContent(); err != nil {
+      return fetchRandomAsset(asset)
     }
-
-    asset.Id = ids[rand.Intn(len(ids) + 1)]
   }
 
-  // Try to get asset content until a valid one is found
-  if _, err := asset.GetContent(); err != nil {
-    fetchRandomAsset(asset)
-  }
-
-  return nil
+  return filePath, nil
 }
 
 func readInput() ([]int, error) {

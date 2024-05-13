@@ -27,11 +27,7 @@ import (
   "path/filepath"
 )
 
-// WriteFile writes some content to a given path.
-// If the path is a directory, the file is written to this directory with the defaultFilename as its filename.
-// If the path is empty, the file is written to the current working directory with the defaultFilename as its filename.
-// It returns the absolute path to the file written.
-func WriteFile(content []byte, outPath string, defaultFilename string) (string, error) {
+func ResolveAbsFilePath(outPath string, defaultFilename string) (string, error) {
   if stat, err := os.Stat(outPath); err == nil {
     if stat.IsDir() {
       outPath = path.Join(outPath, defaultFilename)
@@ -42,14 +38,26 @@ func WriteFile(content []byte, outPath string, defaultFilename string) (string, 
     outPath = defaultFilename
   }
 
-  if err := os.WriteFile(outPath, content, 0644); err != nil {
-    return "", err
-  }
-
-  finalPath, err := filepath.Abs(outPath)
+  absPath, err := filepath.Abs(outPath)
   if err != nil {
     return "", err
   }
 
-  return finalPath, nil
+  return absPath, nil
+}
+
+func FileExists(filePath string) bool {
+  if _, err := os.Stat(filePath); err == nil {
+    return true
+  }
+
+  return false
+}
+
+func WriteFile(content []byte, outPath string) error {
+  if err := os.WriteFile(outPath, content, 0644); err != nil {
+    return err
+  }
+
+  return nil
 }

@@ -208,7 +208,16 @@ func main() {
     if output == "" {
       fmt.Println(string(json))
     } else {
-      outPath, err := lib.WriteFile(json, output, "earth-view.json")
+      filePath, err := lib.ResolveAbsFilePath(output, "earth-view.json")
+      if err != nil {
+        if quiet == false {
+          fmt.Fprintln(os.Stderr, err)
+        }
+
+        os.Exit(1)
+      }
+
+      err = lib.WriteFile(json, filePath)
       if err != nil {
         if quiet == false {
           fmt.Fprintln(os.Stderr, err)
@@ -219,7 +228,7 @@ func main() {
 
       // Report location of file containing results
       if quiet == false {
-        fmt.Printf("Results saved at %s\n", outPath)
+        fmt.Printf("Results saved to %s\n", filePath)
       }
     }
   } else {

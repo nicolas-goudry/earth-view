@@ -62,13 +62,19 @@ Description:
     Run: func(cmd *cobra.Command, args []string) {
       defaultFilename := args[0] + ".jpeg"
 
-      assetContent, err := fetchAssetContent(idNumeric)
+      filePath, err := lib.ResolveAbsFilePath(output, defaultFilename)
       cobra.CheckErr(err)
 
-      outFile, err := lib.WriteFile(assetContent, output, defaultFilename)
-      cobra.CheckErr(err)
+      // Only fetch and write file if it does not yet exist or if overwrite is set
+      if lib.FileExists(filePath) == false || overwrite {
+        assetContent, err := fetchAssetContent(idNumeric)
+        cobra.CheckErr(err)
 
-      fmt.Println(outFile)
+        err = lib.WriteFile(assetContent, filePath)
+        cobra.CheckErr(err)
+      }
+
+      fmt.Println(filePath)
     },
   }
 )
@@ -76,7 +82,7 @@ Description:
 func init() {
   cmd.RootCmd.AddCommand(fetchCmd)
 
-  addOutputFlag(fetchCmd.Flags())
+  addCommonFlags(fetchCmd.Flags())
 }
 
 func fetchAssetContent(id int) ([]byte, error) {

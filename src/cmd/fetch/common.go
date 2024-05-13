@@ -26,7 +26,8 @@ import (
 )
 
 var (
-  output string
+  output    string
+  overwrite bool
 
   helpText = struct {
     process string
@@ -37,10 +38,14 @@ var (
     output: `  By default, the image is saved in the current working directory and its
   identifier is used as the filename. This behaviour can be changed by using the
   '--output' flag. If the provided value is a directory, the file is saved into
-  it and the image identifier is used as the filename.`,
+  it and the image identifier is used as the filename.
+
+  If the output file exists, it is not overwritten. This behaviour can be
+  changed by using the '--overwrite' flag.`,
   }
 )
 
-func addOutputFlag(f *pflag.FlagSet) {
+func addCommonFlags(f *pflag.FlagSet) {
   f.StringVarP(&output, "output", "o", "", "write image to given file or directory")
+  f.BoolVar(&overwrite, "overwrite", false, "overwrite output file if it exists")
 }
