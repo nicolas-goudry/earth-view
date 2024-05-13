@@ -144,7 +144,7 @@ func main() {
     os.Exit(1)
   }
 
-  if f.done == true {
+  if f.done {
     if len(f.errors) > 0 && quiet == false {
       fmt.Fprintln(os.Stderr, "Encountered the following errors:")
 
@@ -152,6 +152,14 @@ func main() {
         fmt.Fprintf(os.Stderr, "  %v\n", err)
       }
       fmt.Fprintln(os.Stderr, "")
+    }
+
+    if len(f.results) == 0 {
+      if quiet == false {
+        fmt.Fprintln(os.Stderr, "No results to save")
+      }
+
+      os.Exit(1)
     }
 
     json, err := generateJSONContent(f.results)
@@ -176,8 +184,10 @@ func main() {
       }
 
       if quiet == false {
-        fmt.Printf("List is available at %s\n", outPath)
+        fmt.Printf("Results saved at %s\n", outPath)
       }
     }
+  } else {
+    os.Exit(1)
   }
 }
