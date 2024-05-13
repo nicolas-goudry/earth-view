@@ -32,15 +32,15 @@ var (
     process string
     output string
   }{
-    process: `  The image metadata is first retrieved from gstatic.com, the server hosting the
-  images assets, then the image is decoded before being saved on the filesystem.`,
+    process: `  The image metadata is first retrieved from gstatic.com (the server hosting the
+  images assets) then the image is decoded before being saved on the filesystem.`,
     output: `  By default, the image is saved in the current working directory and its
   identifier is used as the filename. This behaviour can be changed by using the
   '--output' flag. If the provided value is a directory, the file is saved into
-  it and its identifier is used as the filename.`,
+  it and the image identifier is used as the filename.`,
   }
 )
 
 func addOutputFlag(f *pflag.FlagSet) {
-  f.StringVarP(&output, "output", "o", "", "write to given file path instead of current working directory")
+  f.StringVarP(&output, "output", "o", "", "write image to given file or directory")
 }

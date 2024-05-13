@@ -26,15 +26,18 @@ var (
   }
 )
 
+// Defer program end to allow progress bar to go to 100% before UI is cleared
 func finalPause() tea.Cmd {
   return tea.Tick(time.Second, func(_ time.Time) tea.Msg {
     return fetchCompleteMsg(true)
   })
 }
 
+// Custom messages
 type progressMsg      fetchProgress
 type fetchCompleteMsg bool
 
+// UI state
 type model struct {
   progress progress.Model
   success  int
@@ -101,8 +104,6 @@ func (m model) View() string {
     return ""
   }
 
-  separator := lipgloss.NewStyle().Padding(0, padding).Render("•")
-
   if m.clear {
     return ""
   }
@@ -113,6 +114,8 @@ func (m model) View() string {
       Foreground(red).
       Render("Operation aborted before end")
   }
+
+  separator := lipgloss.NewStyle().Padding(0, padding).Render("•")
 
   return lipgloss.JoinVertical(
     lipgloss.Left,

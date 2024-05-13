@@ -31,6 +31,7 @@ import (
   "strings"
 )
 
+// Asset represents a Google Earth View asset
 type Asset struct {
   Id       int
   raw      []byte
@@ -38,6 +39,7 @@ type Asset struct {
   Content  []byte
 }
 
+// Fetch tries to fetch an asset and save the response content in the raw field
 func (a *Asset) Fetch(retry int) error {
   response, err := http.Get(baseUrl + "/" + strconv.Itoa(a.Id) + ".json")
   if err != nil {
@@ -67,6 +69,8 @@ func (a *Asset) Fetch(retry int) error {
   return nil
 }
 
+// GetMetadata parses the asset JSON content and stores it in the Metadata field
+// If no data is available yet for the asset, it will call Fetch by itself
 func (a *Asset) GetMetadata() (map[string]interface{}, error) {
   if a.raw == nil {
     if err := a.Fetch(0); err != nil {
@@ -85,6 +89,8 @@ func (a *Asset) GetMetadata() (map[string]interface{}, error) {
   return a.Metadata, nil
 }
 
+// GetContent parses and decode the actual asset image from its metadata and stores it in the Content field
+// If no metadata is available yet for the asset, it will call GetMetadata by itself
 func (a *Asset) GetContent() ([]byte, error) {
   if a.Metadata == nil {
     if _, err := a.GetMetadata(); err != nil {

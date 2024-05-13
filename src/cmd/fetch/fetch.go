@@ -49,19 +49,25 @@ Description:
       if err := cobra.MinimumNArgs(1)(cmd, args); err != nil {
         return fmt.Errorf("missing required argument 'identifier'")
       }
+
       id, err := strconv.Atoi(args[0])
       if err != nil {
         return fmt.Errorf("invalid identifier provided: %s. Identifier must be a number", args[0])
       }
+
       idNumeric = id
+
       return nil
     },
     Run: func(cmd *cobra.Command, args []string) {
-      assetContent, err := fetchAssetContent(idNumeric)
       defaultFilename := args[0] + ".jpeg"
+
+      assetContent, err := fetchAssetContent(idNumeric)
       cobra.CheckErr(err)
+
       outFile, err := lib.WriteFile(assetContent, output, defaultFilename)
       cobra.CheckErr(err)
+
       fmt.Println(outFile)
     },
   }
@@ -76,9 +82,10 @@ func init() {
 func fetchAssetContent(id int) ([]byte, error) {
   asset := lib.Asset{ Id: id }
 
-  if content, err := asset.GetContent(); err != nil {
+  content, err := asset.GetContent()
+  if err != nil {
     return nil, err
-  } else {
-    return content, nil
   }
+
+  return content, nil
 }

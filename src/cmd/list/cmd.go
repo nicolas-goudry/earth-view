@@ -63,6 +63,7 @@ Description:
       return nil
     },
     Run: func(_ *cobra.Command, _ []string) {
+      // Call main function which starts the program
       main()
     },
   }

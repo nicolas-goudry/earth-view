@@ -62,9 +62,11 @@ Description:
     Run: func(cmd *cobra.Command, args []string) {
       asset := lib.Asset{}
       fetchRandomAsset(&asset)
+
       defaultFilename := strconv.Itoa(asset.Id) + ".jpeg"
       outFile, err := lib.WriteFile(asset.Content, output, defaultFilename)
       cobra.CheckErr(err)
+
       fmt.Println(outFile)
     },
   }
@@ -89,6 +91,7 @@ func fetchRandomAsset(asset *lib.Asset) error {
     asset.Id = ids[rand.Intn(len(ids) + 1)]
   }
 
+  // Try to get asset content until a valid one is found
   if _, err := asset.GetContent(); err != nil {
     fetchRandomAsset(asset)
   }
@@ -103,7 +106,6 @@ func readInput() ([]int, error) {
   }
 
   var ids []int
-
   if err := json.Unmarshal(content, &ids); err != nil {
     return nil, err
   }

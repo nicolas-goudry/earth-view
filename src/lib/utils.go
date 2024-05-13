@@ -27,6 +27,10 @@ import (
   "path/filepath"
 )
 
+// WriteFile writes some content to a given path.
+// If the path is a directory, the file is written to this directory with the defaultFilename as its filename.
+// If the path is empty, the file is written to the current working directory with the defaultFilename as its filename.
+// It returns the absolute path to the file written.
 func WriteFile(content []byte, outPath string, defaultFilename string) (string, error) {
   if stat, err := os.Stat(outPath); err == nil {
     if stat.IsDir() {
