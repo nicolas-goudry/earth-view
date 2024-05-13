@@ -69,16 +69,18 @@ func (f *fetcher) Start() {
     var wg sync.WaitGroup
     wg.Add(1)
 
-    chunkResults := make(chan result, chunkSize)
+    chunkCh := make(chan result, chunkSize)
     go func(ids []int) {
       defer wg.Done()
-      f.fetchChunk(ids, chunkResults)
+      f.fetchChunk(ids, chunkCh)
     }(chunk)
 
     wg.Wait()
-    close(chunkResults)
+    close(chunkCh)
 
-    for result := range chunkResults {
+    var chunkResults []result
+    for result := range chunkCh {
+      chunkResults = append(chunkResults, result)
       results = append(results, result)
       if result.error != nil {
         f.errors = append(f.errors, result.error)
@@ -87,7 +89,7 @@ func (f *fetcher) Start() {
 
     f.onFetchProgress(fetchProgress{
       percent: float64(len(results)) / float64(idsCount),
-      results: results,
+      results: chunkResults,
     })
   }
 

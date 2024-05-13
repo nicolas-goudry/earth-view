@@ -69,21 +69,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     return m, cmd
 
   case progressMsg:
-    skipped := 0
-    success := 0
-    errored := 0
     for _, result := range msg.results {
       if result.error != nil && strings.Contains(result.error.Error(), "not found") {
-        skipped++
+        m.skipped++
       } else if result.error != nil {
-        errored++
+        m.errored++
       } else {
-        success++
+        m.success++
       }
     }
-    m.skipped = skipped
-    m.success = success
-    m.errored = errored
 
     var cmds []tea.Cmd
 
