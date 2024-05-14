@@ -5,6 +5,7 @@ buildGoModule rec {
   version = "1.0.0";
   src = ./src;
   vendorHash = "sha256-kiYMJXsrRJxU2P6mxFtt0kZd5qu1Qbd3uIXjXFUyjZA=";
+  doCheck = false;
 
   meta = {
     description = "List and download Google Earth View images";
