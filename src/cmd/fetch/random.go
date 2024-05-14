@@ -60,16 +60,8 @@ Description:
     SilenceUsage: true,
     Args: cobra.MaximumNArgs(0),
     Run: func(cmd *cobra.Command, args []string) {
-      asset := lib.Asset{}
-      filePath, err := fetchRandomAsset(&asset)
+      filePath, err := runFetchRandomCmd(input, output, overwrite)
       cobra.CheckErr(err)
-
-      // Only write file if it does not yet exist or if overwrite is set
-      if lib.FileExists(filePath) == false || overwrite {
-        err := lib.WriteFile(asset.Content, filePath)
-        cobra.CheckErr(err)
-      }
-
       fmt.Println(filePath)
     },
   }
@@ -82,21 +74,42 @@ func init() {
   addCommonFlags(randomCmd.Flags())
 }
 
-func pickRandomId() (int, error) {
+func runFetchRandomCmd(input string, output string, overwrite bool) (string, error) {
+  asset := lib.Asset{}
+  filePath, err := fetchRandomAsset(&asset, input, output, overwrite)
+  if err != nil {
+    return "", err
+  }
+
+  // Only write file if it does not yet exist or if overwrite is set
+  if lib.FileExists(filePath) == false || overwrite {
+    err := lib.WriteFile(asset.Content, filePath)
+    return filePath, err
+  }
+
+  return filePath, nil
+}
+
+func pickRandomId(input string) (int, error) {
   if input == "" {
     return lib.KnownIdLowerBoundary + rand.Intn(lib.KnownIdUpperBoundary - lib.KnownIdLowerBoundary + 1), nil
   }
 
-  ids, err := readInput()
+  content, err := os.ReadFile(input)
   if err != nil {
+    return -1, err
+  }
+
+  var ids []int
+  if err := json.Unmarshal(content, &ids); err != nil {
     return -1, err
   }
 
   return ids[rand.Intn(len(ids))], nil
 }
 
-func fetchRandomAsset(asset *lib.Asset) (string, error) {
-  randomId, err := pickRandomId()
+func fetchRandomAsset(asset *lib.Asset, input string, output string, overwrite bool) (string, error) {
+  randomId, err := pickRandomId(input)
   if err != nil {
     return "", err
   }
@@ -110,23 +123,9 @@ func fetchRandomAsset(asset *lib.Asset) (string, error) {
   if lib.FileExists(filePath) == false || overwrite {
     asset.Id = randomId
     if _, err := asset.GetContent(); err != nil {
-      return fetchRandomAsset(asset)
+      return fetchRandomAsset(asset, input, output, overwrite)
     }
   }
 
   return filePath, nil
-}
-
-func readInput() ([]int, error) {
-  content, err := os.ReadFile(input)
-  if err != nil {
-    return nil, err
-  }
-
-  var ids []int
-  if err := json.Unmarshal(content, &ids); err != nil {
-    return nil, err
-  }
-
-  return ids, nil
 }

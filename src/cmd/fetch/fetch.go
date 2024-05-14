@@ -50,30 +50,11 @@ Description:
         return fmt.Errorf("missing required argument 'identifier'")
       }
 
-      id, err := strconv.Atoi(args[0])
-      if err != nil {
-        return fmt.Errorf("invalid identifier provided: %s. Identifier must be a number", args[0])
-      }
-
-      idNumeric = id
-
       return nil
     },
     Run: func(cmd *cobra.Command, args []string) {
-      defaultFilename := args[0] + ".jpeg"
-
-      filePath, err := lib.ResolveAbsFilePath(output, defaultFilename)
+      filePath, err := runFetchCmd(args[0], output, overwrite)
       cobra.CheckErr(err)
-
-      // Only fetch and write file if it does not yet exist or if overwrite is set
-      if lib.FileExists(filePath) == false || overwrite {
-        assetContent, err := fetchAssetContent(idNumeric)
-        cobra.CheckErr(err)
-
-        err = lib.WriteFile(assetContent, filePath)
-        cobra.CheckErr(err)
-      }
-
       fmt.Println(filePath)
     },
   }
@@ -85,13 +66,30 @@ func init() {
   addCommonFlags(fetchCmd.Flags())
 }
 
-func fetchAssetContent(id int) ([]byte, error) {
-  asset := lib.Asset{ Id: id }
-
-  content, err := asset.GetContent()
+func runFetchCmd(id string, output string, overwrite bool) (string, error) {
+  idNumeric, err := strconv.Atoi(id)
   if err != nil {
-    return nil, err
+    return "", fmt.Errorf("invalid identifier provided: %s. Identifier must be a number", id)
   }
 
-  return content, nil
+  filePath, err := lib.ResolveAbsFilePath(output, id + ".jpeg")
+  if err != nil {
+    return "", err
+  }
+
+  // Only fetch and write file if it does not yet exist or if overwrite is set
+  if lib.FileExists(filePath) == false || overwrite {
+    asset := lib.Asset{ Id: idNumeric }
+    content, err := asset.GetContent()
+    if err != nil {
+      return "", err
+    }
+
+    err = lib.WriteFile(content, filePath)
+    if err != nil {
+      return "", err
+    }
+  }
+
+  return filePath, nil
 }
