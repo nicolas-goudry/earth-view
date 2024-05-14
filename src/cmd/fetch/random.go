@@ -48,8 +48,8 @@ Description:
 
 %s
 
-  When '--input' flag is provided, the command expects it to be fed with the
-  output of the 'list' command, either via standard input or the path to a file.
+  When '--input' flag is provided, the command expects it to be fed with a file
+  containing the output of the 'list' command.
 
   When '--input' flag is not provided, a random image identifier will be chosen
   from the known range of possible identifiers. If the selected identifier is
@@ -78,7 +78,7 @@ Description:
 func init() {
   fetchCmd.AddCommand(randomCmd)
 
-  randomCmd.Flags().StringVarP(&input, "input", "i", "", "input file to choose an image from, or standard input if not specified")
+  randomCmd.Flags().StringVarP(&input, "input", "i", "", "input file to choose an image from")
   addCommonFlags(randomCmd.Flags())
 }
 
