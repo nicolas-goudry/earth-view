@@ -22,19 +22,19 @@ THE SOFTWARE.
 package fetch
 
 import (
-	"fmt"
+  "fmt"
   "strconv"
 
   "earth-view/cmd"
   "earth-view/lib"
-	"github.com/spf13/cobra"
+  "github.com/spf13/cobra"
 )
 
 var (
   idNumeric int
 
   fetchCmd = &cobra.Command{
-    Use:   "fetch identifier",
+    Use: "fetch identifier",
     Aliases: []string{"get", "download", "dl"},
     Short: "Fetch images",
     Long: fmt.Sprintf(`Download a Google Earth View image by its identifier.

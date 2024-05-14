@@ -25,7 +25,7 @@ import (
   "fmt"
 
   "earth-view/cmd"
-	"github.com/spf13/cobra"
+  "github.com/spf13/cobra"
 )
 
 var (
@@ -35,7 +35,7 @@ var (
   retry     int
 
   listCmd = &cobra.Command{
-    Use:   "list",
+    Use: "list",
     Aliases: []string{"ls"},
     Short: "Get images list",
     Long: `Get a list of Google Earth View images
@@ -70,9 +70,9 @@ Description:
 )
 
 func init() {
-	cmd.RootCmd.AddCommand(listCmd)
+  cmd.RootCmd.AddCommand(listCmd)
 
-	listCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 20, `number of parallel calls to gstatic.com
+  listCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 20, `number of parallel calls to gstatic.com
 Using a high value may result in potentially wrong failures to fetch images`)
   listCmd.Flags().StringVarP(&output, "output", "o", "", "write to file instead of stdout")
   listCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "do not output anything")

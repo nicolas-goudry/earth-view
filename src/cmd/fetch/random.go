@@ -23,20 +23,20 @@ package fetch
 
 import (
   "encoding/json"
-	"fmt"
+  "fmt"
   "math/rand"
   "os"
   "strconv"
 
   "earth-view/lib"
-	"github.com/spf13/cobra"
+  "github.com/spf13/cobra"
 )
 
 var (
   input string
 
   randomCmd = &cobra.Command{
-    Use:   "random",
+    Use: "random",
     Aliases: []string{"rnd", "rand"},
     Short: "Fetch random images",
     Long: fmt.Sprintf(`Download a random Google Earth View image.
@@ -76,7 +76,7 @@ Description:
 )
 
 func init() {
-	fetchCmd.AddCommand(randomCmd)
+  fetchCmd.AddCommand(randomCmd)
 
   randomCmd.Flags().StringVarP(&input, "input", "i", "", "input file to choose an image from, or standard input if not specified")
   addCommonFlags(randomCmd.Flags())
