@@ -23,11 +23,14 @@ Currently supporting:
 {
   # Use unstable to get latest updates
   inputs.earth-view.url = "github:nicolas-goudry/earth-view";
+
   # Pin to a given version
   #inputs.earth-view.url = "github:nicolas-goudry/earth-view/v1.4.1";
+
   # Use FlakeHub
   #inputs.earth-view.url = "https://flakehub.com/f/nicolas-goudry/earth-view/*.tar.gz";
-  # Optional, follow your nixpkgs input
+
+  # You may optionally follow your nixpkgs input
   #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
   outputs = { self, nixpkgs, earth-view }: {
@@ -70,11 +73,14 @@ Currently supporting:
 {
   # Use unstable to get latest updates
   inputs.earth-view.url = "github:nicolas-goudry/earth-view";
+
   # Pin to a given version
   #inputs.earth-view.url = "github:nicolas-goudry/earth-view/v1.4.1";
+
   # Use FlakeHub
   #inputs.earth-view.url = "https://flakehub.com/f/nicolas-goudry/earth-view/*.tar.gz";
-  # Optional, follow your nixpkgs input
+
+  # You may optionally follow your nixpkgs input
   #inputs.earth-view.inputs.nixpkgs.follows = "nixpkgs";
 
   outputs = { self, nixpkgs, home-manager, earth-view }: {
@@ -136,7 +142,7 @@ Currently supporting:
     imageDirectory = ".earth-view";
     display = "fill";
     enableXinerama = true;
-  }
+  };
 }
 ```
 
