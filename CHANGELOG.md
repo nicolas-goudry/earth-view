@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.0 - 19/05/2024
+
+🐞 **Bug Fixes**
+
+- 🏠 Invalid module path (https://github.com/nicolas-goudry/earth-view/pull/7, @gador)
+
 ## v1.4.2 - 28/04/2024
 
 🐞 **Bug Fixes**
