@@ -12,11 +12,11 @@ buildGoModule rec {
     mv $out/bin/scraper $out/bin/${pname}
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Earth View image URLs scraper";
     homepage = "https://github.com/nicolas-goudry/earth-view";
-    license = licenses.mit;
-    maintainers = with maintainers; [ nicolas-goudry ];
+    license = lib.licenses.mit;
+    maintainers = [ lib.maintainers.nicolas-goudry ];
     mainProgram = pname;
   };
 }
