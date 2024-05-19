@@ -29,6 +29,7 @@ import (
   "net/http"
   "strconv"
   "strings"
+  "time"
 )
 
 // Asset represents a Google Earth View asset
@@ -41,7 +42,10 @@ type Asset struct {
 
 // Fetch tries to fetch an asset and save the response content in the raw field
 func (a *Asset) Fetch(retry int) error {
-  response, err := http.Get(baseUrl + "/" + strconv.Itoa(a.Id) + ".json")
+  client := http.Client{
+    Timeout: 5 * time.Second,
+  }
+  response, err := client.Get(baseUrl + "/" + strconv.Itoa(a.Id) + ".json")
   if err != nil {
     return err
   }
