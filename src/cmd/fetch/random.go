@@ -123,6 +123,10 @@ func fetchRandomAsset(asset *lib.Asset, input string, output string, overwrite b
   if lib.FileExists(filePath) == false || overwrite {
     asset.Id = randomId
     if _, err := asset.GetContent(); err != nil {
+      if os.IsTimeout(err) {
+        return "", err
+      }
+
       return fetchRandomAsset(asset, input, output, overwrite)
     }
   }
