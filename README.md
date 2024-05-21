@@ -13,6 +13,8 @@ Currently supporting:
 
 > Wayland compositors support will come soon.
 
+*Disclaimer:* this project is not affiliated with Google in any way. Images are protected by copyright and are licensed only for use as wallpapers.
+
 ## 📥 Installation
 
 ### ❄️ NixOS
