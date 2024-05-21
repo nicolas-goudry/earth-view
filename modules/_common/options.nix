@@ -64,11 +64,9 @@
     type = lib.types.bool;
     default = false;
     description = ''
-      Upscale images to a 4× scale factor after they are
-      downloaded.
+      Upscale images to a 4× scale factor after they are downloaded.
 
-      Note that this option requires a GPU to be available in
-      order to work.
+      Note that this option requires a GPU to be available in order to work.
     '';
   };
 

@@ -144,6 +144,7 @@ Currently supporting:
     display = "fill";
     enableXinerama = true;
     autoStart = false;
+    autoUpscale = false;
     gc = {
       enable = false;
       keep = 10;
@@ -205,6 +206,26 @@ Whether to start the service automatically, along with its timer when [`interval
 > This feature relies on activation scripts from NixOS (`system.userActivationScripts`) and Home Manager (`home.activation`).
 >
 > If you are using Home Manager, you may want to use [`systemd.user.startServices`](https://nix-community.github.io/home-manager/options.xhtml#opt-systemd.user.startServices) instead.
+
+### `autoUpscale`
+
+All Google Earth View images have a resolution of 1200×1800px. Because of this low-ish size, they may seem blurry or even ugly on very high resolutions as well as ultra-wide monitors.
+
+This option aims to fix this by upscaling images to a 4× scale factor after they are downloaded. The upscaling process uses [Real-ESRGAN-ncnn-vulkan](https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan) under the hood. Results are mostly very good, but some images are still a bit blurry (on a 3440×1440 ultra-wide monitor).
+
+> [!CAUTION]
+> **A GPU must be available for this option to work.** The module will try to upscale the image and resort to use the original image in case of failure.
+>
+> When the option is enabled, it is important to keep in mind the following things:
+> * the service will use much more compute resources than when upscaling is disabled
+> * the service execution time will greatly increase
+> * the upscaled images will take much more disk space than their original counterparts
+>   * greatest size observed was ~55MB for an original of ~900KB
+>   * size of upscaled images does not seem to be strictly related to their original size (an image of ~1MB got upscaled to 40MB)
+>
+> If you still choose to enable the option, it is recommended to:
+> * set a high enough [`interval`](#interval) to avoid disturbing other processes
+> * enable the [`gc`](#gcenable) option if you care about disk space (after all, the whole upscaled collection is believed to weigh more than 100GB 🐘)
 
 ### `gc.enable`
 
