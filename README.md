@@ -232,7 +232,7 @@ This module is heavily based on the [`random-background` service](https://github
 
 The idea to create this module was triggered by the [Google Earth Wallpaper Gnome extension](https://extensions.gnome.org/extension/1295/google-earth-wallpaper/), which is not anymore compatible with Gnome 45 or Gnome 46.
 
-Last but not least, this would not be possible without the great [Google Earth View](https://earthview.withgoogle.com) website and the [Chrome extension](https://chromewebstore.google.com/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh).
+Last but not least, this would not be possible without the great [Google Earth View](https://earthview.withgoogle.com) website (if it is down, use the [Wayback Machine](https://web.archive.org/web/20240118081629/http://earthview.withgoogle.com/) to browse it) and the [Chrome extension](https://chromewebstore.google.com/detail/earth-view-from-google-ea/bhloflhklmhfpedakmangadcdofhnnoh).
 
 ## 📝 TODO
 
