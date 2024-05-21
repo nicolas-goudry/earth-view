@@ -5,7 +5,7 @@
 # | false  | N/A      | N/A       | Nothing                                                 |
 # | true   | null     | false     | Start on login                                          |
 # | true   | null     | true      | Start on login + activation                             |
-# | true   | "10s"    | false     | Start on login + each 10s after manual activation       |
+# | true   | "10s"    | false     | Start on login + each 10s after login                   |
 # | true   | "10s"    | true      | Start on login + activation + each 10s after activation |
 # -------------------------------------------------------------------------------------------
 { config, lib, pkgs, ... }@args:
@@ -48,16 +48,15 @@ in
     }
     (lib.mkIf (cfg.interval != null) {
       systemd.user.timers.earth-view = {
-        unitConfig = { Description = "Set random desktop background from Earth View"; };
-        timerConfig = { OnUnitActiveSec = cfg.interval; };
-        wantedBy = [ "timers.target" ];
+        unitConfig.Description = "Set random desktop background from Earth View";
+        timerConfig.OnUnitActiveSec = cfg.interval;
+        # Dependency to earth-view.service is required here so that the timer starts when the service starts
+        # On HM module, the timer is automatically started along with the service (why? how? dunno)
+        wantedBy = [ "timers.target" "earth-view.service" ];
       };
     })
     (lib.mkIf cfg.autoStart {
-      system.userActivationScripts.earthViewAutoStart.text = lib.concatStringsSep "\n" [
-        (if cfg.interval == null then "" else "${pkgs.systemd}/bin/systemctl --user start earth-view.timer")
-        "${pkgs.systemd}/bin/systemctl --user start earth-view.service"
-      ];
+      system.userActivationScripts.earthViewAutoStart.text = "${pkgs.systemd}/bin/systemctl --user start earth-view.service";
     })
   ]);
 }
