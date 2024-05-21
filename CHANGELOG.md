@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.1 - 19/05/2024
+
+🐞 **Bug Fixes**
+
+- 🏠 Invalid source file given to start script
+
 ## v2.1.0 - 21/05/2024
 
 🚀 **Features**
