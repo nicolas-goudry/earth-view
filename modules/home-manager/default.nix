@@ -18,7 +18,7 @@ let
   cfg = config.services.earth-view;
   common = import ../common args;
   hmStartServices = config.systemd.user.startServices;
-  startScript = common.mkStartScript "$HOME/${cfg.imageDirectory}";
+  startScript = common.mkStartScript "$HOME/${cfg.imageDirectory}/.source";
 in
 {
   meta.maintainers = [ lib.maintainers.nicolas-goudry ];
