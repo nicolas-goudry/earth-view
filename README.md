@@ -157,6 +157,12 @@ Currently supporting:
 > ```
 >
 > This command can also be used to manually switch the background.
+>
+> Same goes for the timer, if `autoStart` is set to `false`, it will only be started on the next login. To launch the timer after installation you have to manually start it:
+>
+> ```shell
+> systemctl --user start earth-view.timer
+> ```
 
 ### `enable`
 
@@ -193,7 +199,7 @@ Whether to start the service automatically, along with its timer when `interval`
 > [!NOTE]
 > This feature relies on activation scripts from NixOS (`system.userActivationScripts`) and Home Manager (`home.activation`).
 >
-> However if you are using Home Manager and have the `systemd.user.startServices` option set to anything else than `suggest` or `false`, the module will not define any activation script and will let Home Manager activate the needed services.
+> If you are using Home Manager, you may want to use [`systemd.user.startServices`](https://nix-community.github.io/home-manager/options.xhtml#opt-systemd.user.startServices) instead.
 
 ## 🧐 How it works
 
