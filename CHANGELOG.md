@@ -1,10 +1,22 @@
 # Changelog
 
+## v2.1.0 - 21/05/2024
+
+🚀 **Features**
+
+- Full rewrite of Go module (https://github.com/nicolas-goudry/earth-view/pull/8)
+- Add `autoStart` option (https://github.com/nicolas-goudry/earth-view/pull/12)
+
+✨ **Polish**
+
+- Avoid Nix `with` usage (https://github.com/nicolas-goudry/earth-view/pull/9)
+- Deduplicate code (https://github.com/nicolas-goudry/earth-view/pull/11)
+
 ## v2.0.0 - 19/05/2024
 
 🐞 **Bug Fixes**
 
-- 🏠 Invalid module path (https://github.com/nicolas-goudry/earth-view/pull/7, @gador)
+- 🏠 Invalid module path (https://github.com/nicolas-goudry/earth-view/pull/7)
 
 ## v1.4.2 - 28/04/2024
 
