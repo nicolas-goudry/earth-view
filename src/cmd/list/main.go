@@ -118,7 +118,7 @@ func (f *fetcher) Start() {
   }
 
   // Mark fetching as done
-  // This is needed to avoid outputing partial results/errors to user in case Ctrl+C was pressed in TUI program
+  // This is needed to avoid outputting partial results/errors to user in case Ctrl+C was pressed in TUI program
   f.done = true
 }
 
