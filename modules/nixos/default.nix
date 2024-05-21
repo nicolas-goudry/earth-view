@@ -1,3 +1,13 @@
+# Test cases:
+# -------------------------------------------------------------------------------------------
+# | enable | interval | autoStart | behavior                                                |
+# | ------ | -------- | --------- | ------------------------------------------------------- |
+# | false  | N/A      | N/A       | Nothing                                                 |
+# | true   | null     | false     | Start on login                                          |
+# | true   | null     | true      | Start on login + activation                             |
+# | true   | "10s"    | false     | Start on login + each 10s after manual activation       |
+# | true   | "10s"    | true      | Start on login + activation + each 10s after activation |
+# -------------------------------------------------------------------------------------------
 { config, lib, pkgs, ... }@args:
 
 let
@@ -42,6 +52,12 @@ in
         timerConfig = { OnUnitActiveSec = cfg.interval; };
         wantedBy = [ "timers.target" ];
       };
+    })
+    (lib.mkIf cfg.autoStart {
+      system.userActivationScripts.earthViewAutoStart.text = lib.concatStringsSep "\n" [
+        (if cfg.interval == null then "" else "${pkgs.systemd}/bin/systemctl --user start earth-view.timer")
+        "${pkgs.systemd}/bin/systemctl --user start earth-view.service"
+      ];
     })
   ]);
 }
