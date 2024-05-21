@@ -2,12 +2,12 @@
 
 let
   cfg = config.services.earth-view;
-  opts = import ../options.nix { inherit lib; };
-  startScript = (import ../script.nix args) "/etc/earth-view/.source";
+  common = import ../common args;
+  startScript = common.mkStartScript "/etc/earth-view/.source";
 in
 {
   meta.maintainers = [ lib.maintainers.nicolas-goudry ];
-  options.services.earth-view = opts;
+  options.services.earth-view = common.options;
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
     {

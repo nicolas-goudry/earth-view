@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit ((pkgs.callPackage ../. { inherit pkgs; })) earth-view;
+  inherit ((pkgs.callPackage ../../. { inherit pkgs; })) earth-view;
 
   cfg = config.services.earth-view;
 
