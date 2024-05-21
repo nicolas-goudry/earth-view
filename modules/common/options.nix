@@ -54,4 +54,13 @@
       Note that this option has no effect on GNOME shell desktops.
     '';
   };
+
+  autoStart = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Whether to start the service automatically, along with its
+      timer when `interval` is set.
+    '';
+  };
 }

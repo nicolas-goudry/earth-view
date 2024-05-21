@@ -142,22 +142,19 @@ Currently supporting:
     imageDirectory = ".earth-view";
     display = "fill";
     enableXinerama = true;
+    autoStart = false;
   };
 }
 ```
 
 > [!TIP]
-> Currently, the systemd service is not automatically started. To manually start it, you can use the following command after applying your configuration:
+> If `autoStart` is set to `false`, the service will only be started on the next login. To set the background after installation you have to manually start the main service:
 >
-> ```shell
-> systemctl --user start earth-view.timer
-> ```
->
-> If that does not work or you would like to manually switch the background you can start/restart the main service:
 > ```shell
 > systemctl --user start earth-view
 > ```
 >
+> This command can also be used to manually switch the background.
 
 ### `enable`
 
@@ -186,6 +183,15 @@ Will place a separate image per screen when enabled, otherwise a single image wi
 
 > [!NOTE]
 > This option has no effect neither on GNOME nor KDE.
+
+### `autoStart`
+
+Whether to start the service automatically, along with its timer when `interval` is set.
+
+> [!NOTE]
+> This feature relies on activation scripts from NixOS (`system.userActivationScripts`) and Home Manager (`home.activation`).
+>
+> However if you are using Home Manager and have the `systemd.user.startServices` option set to anything else than `suggest` or `false`, the module will not define any activation script and will let Home Manager activate the needed services.
 
 ## 🧐 How it works
 
