@@ -1,19 +1,14 @@
 { buildGoModule, lib, ... }:
 
 buildGoModule rec {
-  pname = "ev-fetcher";
-  version = "0.0.1";
-  src = ../src;
-
-  vendorHash = null;
-  subPackages = [ "./fetcher" ];
-
-  postInstall = ''
-    mv $out/bin/fetcher $out/bin/${pname}
-  '';
+  pname = "earth-view";
+  version = "1.0.0";
+  src = ./src;
+  vendorHash = "sha256-kiYMJXsrRJxU2P6mxFtt0kZd5qu1Qbd3uIXjXFUyjZA=";
+  doCheck = false;
 
   meta = {
-    description = "Earth View image fetcher";
+    description = "List and download Google Earth View images";
     homepage = "https://github.com/nicolas-goudry/earth-view";
     license = lib.licenses.mit;
     maintainers = [ lib.maintainers.nicolas-goudry ];

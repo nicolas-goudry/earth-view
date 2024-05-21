@@ -6,7 +6,6 @@ in
 pkgs.mkShell {
   nativeBuildInputs = [
     pkgs.go
-    localPkgs.ev-scraper
-    localPkgs.ev-fetcher
+    localPkgs.earth-view
   ];
 }

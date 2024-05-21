@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit ((pkgs.callPackage ../.. { inherit pkgs; })) ev-fetcher;
+  inherit ((pkgs.callPackage ../.. { inherit pkgs; })) earth-view;
 
   cfg = config.services.earth-view;
 
@@ -9,12 +9,11 @@ let
     ([ "--bg-${cfg.display}" "--no-fehbg" ]
       ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
 
-  # GNOME shell does not use X background (https://github.com/derf/feh/issues/225)
   startScript = pkgs.writeScriptBin "start-earth-view" ''
     #!${pkgs.bash}/bin/bash
 
     mkdir -p $HOME/$1
-    file=$(${ev-fetcher}/bin/ev-fetcher $(${pkgs.coreutils}/bin/shuf -n1 /etc/earth-view/.source) $HOME/$1)
+    file=$(${earth-view}/bin/earth-view fetch random -i /etc/earth-view/.source -o $HOME/$1)
 
     if test $? -ne 0; then
       ${pkgs.coreutils}/bin/echo "Error while fetching image"
@@ -108,7 +107,7 @@ in
         }
       ];
 
-      environment.etc."earth-view/.source".source = ../../_earthview.txt;
+      environment.etc."earth-view/.source".source = ../../earth-view.json;
 
       systemd.user.services.earth-view = {
         unitConfig = {
