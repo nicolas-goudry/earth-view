@@ -83,9 +83,7 @@ in
     })
     # Define activation script if autoStart or garbage collection with interval are enabled
     (lib.mkIf (cfg.autoStart || (cfg.gc.enable && cfg.gc.interval != null)) {
-      system.userActivationScripts.earthViewAutoStart.text = ''
-          #!${pkgs.bash}/bin/bash
-        ''
+      system.userActivationScripts.earthViewAutoStart.text = ""
         # Start main service if autoStart is enabled
         + (lib.optionalString cfg.autoStart ''
           ${pkgs.systemd}/bin/systemctl --user start earth-view.service
