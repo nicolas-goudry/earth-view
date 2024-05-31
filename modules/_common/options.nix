@@ -59,4 +59,36 @@
       is set.
     '';
   };
+
+  gc = {
+    enable = lib.mkEnableOption "automatic garbage collection";
+
+    keep = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 10;
+      description = ''
+        The number of images to keep from being garbage collected. Only the most recent
+        images will be kept. The current background will never be deleted.
+      '';
+    };
+
+    interval = lib.mkOption {
+      type = with lib.types; nullOr str;
+      default = null;
+      description = ''
+        The duration between garbage collection runs. Set to `null` to run garbage
+        collection along with the main service. Should be formatted as a duration
+        understood by systemd.
+      '';
+    };
+
+    sizeThreshold = lib.mkOption {
+      type = with lib.types; strMatching "[0-9]+([KMGTPEZYRQ](i?B)?)?";
+      default = "0";
+      description = ''
+        Garbage collect images only if collection size exceeds this threshold. Should be
+        formatted as a string understood by `du`'s size option.
+      '';
+    };
+  };
 }
