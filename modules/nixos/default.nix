@@ -32,7 +32,7 @@ in
       systemd.user.services.earth-view = {
         unitConfig = {
           Description = "Set random desktop background from Earth View";
-          After = [ "graphical-session-pre.target" ];
+          After = [ "graphical-session.target" ];
           PartOf = [ "graphical-session.target" ];
         };
 
