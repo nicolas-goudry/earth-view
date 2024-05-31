@@ -53,6 +53,34 @@ in
         Install.WantedBy = [ "timers.target" ];
       };
     })
+    # Define garbage collector service if enabled
+    (lib.mkIf cfg.gc.enable {
+      systemd.user.services.earth-view-gc = {
+        Unit = {
+          Description = "Garbage collect Earth View images";
+          After = [ "earth-view.service" ];
+          PartOf = [ "earth-view.service" ];
+        };
+
+        Service = {
+          Type = "oneshot";
+          IOSchedulingClass = "idle";
+          ExecStart = "${gcScript}/bin/gc";
+        };
+      };
+    })
+    # Make garbage collector run after main service if enabled without interval
+    (lib.mkIf (cfg.gc.enable && (cfg.gc.interval == null)) {
+      systemd.user.services.earth-view-gc.Install.WantedBy = [ "earth-view.service" ];
+    })
+    # Define garbage collector timer if enabled with interval
+    (lib.mkIf (cfg.gc.enable && cfg.gc.interval != null) {
+      systemd.user.timers.earth-view-gc = {
+        Unit.Description = "Garbage collect Earth View images";
+        Timer.OnUnitActiveSec = cfg.gc.interval;
+        Install.WantedBy = [ "timers.target" ];
+      };
+    })
     # Define activation script if autoStart or garbage collection with interval are enabled
     (lib.mkIf (cfg.autoStart || (cfg.gc.enable && cfg.gc.interval != null)) {
       home.activation.earth-view = lib.hm.dag.entryAfter [ "writeBoundary" ] (
@@ -81,34 +109,6 @@ in
           run ${pkgs.systemd}/bin/systemctl --user start earth-view-gc.service
         '')
       );
-    })
-    # Define garbage collector service if enabled
-    (lib.mkIf cfg.gc.enable {
-      systemd.user.services.earth-view-gc = {
-        Unit = {
-          Description = "Garbage collect Earth View images";
-          After = [ "earth-view.service" ];
-          PartOf = [ "earth-view.service" ];
-        };
-
-        Service = {
-          Type = "oneshot";
-          IOSchedulingClass = "idle";
-          ExecStart = "${gcScript}/bin/gc";
-        };
-      };
-    })
-    # Make garbage collector run after main service if enabled without interval
-    (lib.mkIf (cfg.gc.enable && (cfg.gc.interval == null)) {
-      systemd.user.services.earth-view-gc.Install.WantedBy = [ "earth-view.service" ];
-    })
-    # Define garbage collector timer if enabled with interval
-    (lib.mkIf (cfg.gc.enable && cfg.gc.interval != null) {
-      systemd.user.timers.earth-view-gc = {
-        Unit.Description = "Garbage collect Earth View images";
-        Timer.OnUnitActiveSec = cfg.gc.interval;
-        Install.WantedBy = [ "timers.target" ];
-      };
     })
   ]);
 }
