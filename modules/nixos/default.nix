@@ -25,8 +25,10 @@ in
     {
       inherit (common) assertions;
 
+      # Copy source of truth to /etc
       environment.etc."earth-view/.source".source = ../../earth-view.json;
 
+      # Define service
       systemd.user.services.earth-view = {
         unitConfig = {
           Description = "Set random desktop background from Earth View";
@@ -43,6 +45,7 @@ in
         wantedBy = [ "graphical-session.target" ];
       };
     }
+    # Define timer if interval is defined
     (lib.mkIf (cfg.interval != null) {
       systemd.user.timers.earth-view = {
         unitConfig.Description = "Set random desktop background from Earth View";
@@ -50,6 +53,7 @@ in
         wantedBy = [ "timers.target" ];
       };
     })
+    # Define garbage collector service if enabled
     (lib.mkIf cfg.gc.enable {
       systemd.user.services.earth-view-gc = {
         unitConfig = {
@@ -65,9 +69,11 @@ in
         };
       };
     })
+    # Make garbage collector run after main service if enabled without interval
     (lib.mkIf (cfg.gc.enable && (cfg.gc.interval == null)) {
       systemd.user.services.earth-view-gc.wantedBy = [ "earth-view.service" ];
     })
+    # Define garbage collector timer if enabled with interval
     (lib.mkIf (cfg.gc.enable && cfg.gc.interval != null) {
       systemd.user.timers.earth-view-gc = {
         unitConfig.Description = "Garbage collect Earth View images";
@@ -75,6 +81,7 @@ in
         wantedBy = [ "timers.target" ];
       };
     })
+    # Define activation script if autoStart or garbage collection with interval are enabled
     (lib.mkIf (cfg.autoStart || (cfg.gc.enable && cfg.gc.interval != null)) {
       system.userActivationScripts.earthViewAutoStart.text = ''
           #!${pkgs.bash}/bin/bash
