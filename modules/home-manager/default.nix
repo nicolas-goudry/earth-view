@@ -50,7 +50,7 @@ in
       systemd.user.timers.earth-view = {
         Unit.Description = "Set random desktop background from Earth View";
         Timer.OnUnitActiveSec = cfg.interval;
-        Install.WantedBy = [ "timers.target" ];
+        Install.WantedBy = [ "timers.target" "earth-view.service" ];
       };
     })
     # Define garbage collector service if enabled
@@ -78,7 +78,7 @@ in
       systemd.user.timers.earth-view-gc = {
         Unit.Description = "Garbage collect Earth View images";
         Timer.OnUnitActiveSec = cfg.gc.interval;
-        Install.WantedBy = [ "timers.target" ];
+        Install.WantedBy = [ "timers.target" "earth-view-gc.service" ];
       };
     })
     # Define activation script if autoStart or garbage collection with interval are enabled
@@ -96,10 +96,6 @@ in
           }
 
         ''
-        # Start service timer if interval is set and autoStart is enabled
-        + (lib.optionalString (cfg.autoStart && cfg.interval != null) ''
-          run ${pkgs.systemd}/bin/systemctl --user start earth-view.timer
-        '')
         # Start main service if autoStart is enabled
         + (lib.optionalString cfg.autoStart ''
           run ${pkgs.systemd}/bin/systemctl --user start earth-view.service
