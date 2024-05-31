@@ -144,6 +144,12 @@ Currently supporting:
     display = "fill";
     enableXinerama = true;
     autoStart = false;
+    gc = {
+      enable = false;
+      keep = 10;
+      interval = null;
+      sizeThreshold = "0";
+    };
   };
 }
 ```
@@ -199,6 +205,26 @@ Whether to start the service automatically, along with its timer when [`interval
 > This feature relies on activation scripts from NixOS (`system.userActivationScripts`) and Home Manager (`home.activation`).
 >
 > If you are using Home Manager, you may want to use [`systemd.user.startServices`](https://nix-community.github.io/home-manager/options.xhtml#opt-systemd.user.startServices) instead.
+
+### `gc.enable`
+
+Whether to enable automatic garbage collection.
+
+### `gc.keep`
+
+The number of images to keep from being garbage collected. Only the most recent images will be kept. The current background will **never** be deleted.
+
+### `gc.interval`
+
+The duration between garbage collection runs. Set to `null` to run garbage collection along with the main service. Should be formatted as a [duration understood by systemd](https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Parsing%20Time%20Spans).
+
+### `gc.sizeThreshold`
+
+Garbage collect images only if collection size exceeds this threshold. Should be formatted as a string [understood by `du`'s size option](https://man.archlinux.org/man/du.1.en).
+
+Examples:
+* `"10M"` or `"10MiB"`: deletes images when collection exceeds 10MiB (power of 1024)
+* `"1GB"`: deletes images when collection exceeds 1GB (power of 1000)
 
 ## 🧐 How it works
 
