@@ -11,6 +11,8 @@
 { config, lib, pkgs, ... }@args:
 
 let
+  inherit (common) gcScript;
+
   cfg = config.services.earth-view;
   common = import ../_common args;
   startScript = common.mkStartScript "/etc/earth-view/.source";
@@ -56,7 +58,38 @@ in
       };
     })
     (lib.mkIf cfg.autoStart {
-      system.userActivationScripts.earthViewAutoStart.text = "${pkgs.systemd}/bin/systemctl --user start earth-view.service";
+      system.userActivationScripts.earthViewAutoStart.text = ''
+        ${pkgs.systemd}/bin/systemctl --user start earth-view.service
+      '';
+    })
+    (lib.mkIf cfg.gc.enable {
+      systemd.user.services.earth-view-gc = {
+        unitConfig = {
+          Description = "Garbage collect Earth View images";
+          After = [ "earth-view.service" ];
+          PartOf = [ "earth-view.service" ];
+        };
+
+        serviceConfig = {
+          Type = "oneshot";
+          IOSchedulingClass = "idle";
+          ExecStart = "${gcScript}/bin/gc";
+        };
+      };
+    })
+    (lib.mkIf (cfg.gc.enable && (cfg.gc.interval == null)) {
+      systemd.user.services.earth-view-gc.wantedBy = [ "earth-view.service" ];
+    })
+    (lib.mkIf (cfg.gc.enable && cfg.gc.interval != null) {
+      system.userActivationScripts.earthViewAutoStart.text = ''
+        ${pkgs.systemd}/bin/systemctl --user start earth-view-gc.service
+      '';
+
+      systemd.user.timers.earth-view-gc = {
+        unitConfig.Description = "Garbage collect Earth View images";
+        timerConfig.OnUnitActiveSec = cfg.gc.interval;
+        wantedBy = [ "timers.target" ];
+      };
     })
   ]);
 }
