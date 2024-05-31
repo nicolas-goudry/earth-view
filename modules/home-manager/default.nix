@@ -23,12 +23,7 @@ in
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
     {
-      assertions = [
-        {
-          assertion = pkgs.stdenv.isLinux;
-          message = "services.earth-view is only compatible with Linux systems";
-        }
-      ];
+      inherit (common) assertions;
 
       home.file."${cfg.imageDirectory}/.source".source = ../../earth-view.json;
 
