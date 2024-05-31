@@ -47,15 +47,8 @@ in
       systemd.user.timers.earth-view = {
         unitConfig.Description = "Set random desktop background from Earth View";
         timerConfig.OnUnitActiveSec = cfg.interval;
-        # Dependency to earth-view.service is required here so that the timer starts when the service starts
-        # On HM module, the timer is automatically started along with the service (why? how? dunno)
-        wantedBy = [ "timers.target" "earth-view.service" ];
+        wantedBy = [ "timers.target" ];
       };
-    })
-    (lib.mkIf cfg.autoStart {
-      system.userActivationScripts.earthViewAutoStart.text = ''
-        ${pkgs.systemd}/bin/systemctl --user start earth-view.service
-      '';
     })
     (lib.mkIf cfg.gc.enable {
       systemd.user.services.earth-view-gc = {
@@ -76,15 +69,28 @@ in
       systemd.user.services.earth-view-gc.wantedBy = [ "earth-view.service" ];
     })
     (lib.mkIf (cfg.gc.enable && cfg.gc.interval != null) {
-      system.userActivationScripts.earthViewAutoStart.text = ''
-        ${pkgs.systemd}/bin/systemctl --user start earth-view-gc.service
-      '';
-
       systemd.user.timers.earth-view-gc = {
         unitConfig.Description = "Garbage collect Earth View images";
         timerConfig.OnUnitActiveSec = cfg.gc.interval;
         wantedBy = [ "timers.target" ];
       };
+    })
+    (lib.mkIf (cfg.autoStart || (cfg.gc.enable && cfg.gc.interval != null)) {
+      system.userActivationScripts.earthViewAutoStart.text = ''
+          #!${pkgs.bash}/bin/bash
+        ''
+        # Start service timer if interval is set and autoStart is enabled
+        + (lib.optionalString (cfg.autoStart && cfg.interval != null) ''
+          ${pkgs.systemd}/bin/systemctl --user start earth-view.timer
+        '')
+        # Start main service if autoStart is enabled
+        + (lib.optionalString cfg.autoStart ''
+          ${pkgs.systemd}/bin/systemctl --user start earth-view.service
+        '')
+        # Start garbage collector service if enabled with interval
+        + (lib.optionalString (cfg.gc.enable && cfg.gc.interval != null) ''
+          ${pkgs.systemd}/bin/systemctl --user start earth-view-gc.service
+        '');
     })
   ]);
 }
