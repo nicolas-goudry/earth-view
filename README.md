@@ -149,7 +149,7 @@ Currently supporting:
 ```
 
 > [!TIP]
-> If `autoStart` is set to `false`, the service will only be started on the next login. To set the background after installation you have to manually start the main service:
+> If [`autoStart`](#autostart) is set to `false`, the service will only be started on the next login. To set the background after installation you have to manually start the main service:
 >
 > ```shell
 > systemctl --user start earth-view
@@ -157,7 +157,7 @@ Currently supporting:
 >
 > This command can also be used to manually switch the background.
 >
-> Same goes for the timer, if `autoStart` is set to `false`, it will only be started on the next login. To launch the timer after installation you have to manually start it:
+> Same goes for the timer, if [`autoStart`](#autostart) is set to `false`, it will only be started on the next login. To launch the timer after installation you have to manually start it:
 >
 > ```shell
 > systemctl --user start earth-view.timer
@@ -193,7 +193,7 @@ Will place a separate image per screen when enabled, otherwise a single image wi
 
 ### `autoStart`
 
-Whether to start the service automatically, along with its timer when `interval` is set.
+Whether to start the service automatically, along with its timer when [`interval`](#interval) is set.
 
 > [!NOTE]
 > This feature relies on activation scripts from NixOS (`system.userActivationScripts`) and Home Manager (`home.activation`).
@@ -231,7 +231,7 @@ To select an image, the `fetch random` command is used to select a random image 
 
 ### systemd
 
-Both modules use a systemd user-managed unit, along with a timer when `interval` is specified.
+Both modules use a systemd user-managed unit, along with a timer when [`interval`](#interval) is specified.
 
 The service executes a Bash script which uses the Go module described in the previous section to fetch the image and then set the desktop background accordingly. Read further for more details.
 
