@@ -12,7 +12,7 @@
 
 let
   cfg = config.services.earth-view;
-  common = import ../common args;
+  common = import ../_common args;
   startScript = common.mkStartScript "/etc/earth-view/.source";
 in
 {
