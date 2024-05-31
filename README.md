@@ -1,7 +1,6 @@
 # 🌎 earth-view
 
-![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge
-)](https://flakehub.com/flake/nicolas-goudry/earth-view)
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge)](https://flakehub.com/flake/nicolas-goudry/earth-view)
 
 Randomly set desktop background from 2600+ images sourced from [Google Earth View](https://earthview.withgoogle.com).
 
