@@ -63,15 +63,14 @@ in
             fi
           }
 
-          if test "${lib.boolToString cfg.autoStart}" = "true"; then
-            if test -n "${toString cfg.interval}"; then
-              run ${pkgs.systemd}/bin/systemctl --user start earth-view.timer
-            fi
-
-            run ${pkgs.systemd}/bin/systemctl --user start earth-view.service
-          fi
-        '' + (lib.optionalString (cfg.gc.enable && cfg.gc.interval != null) ''
-
+        ''
+        + (lib.optionalString (cfg.autoStart && cfg.interval != null) ''
+          run ${pkgs.systemd}/bin/systemctl --user start earth-view.timer
+        '')
+        + (lib.optionalString cfg.autoStart ''
+          run ${pkgs.systemd}/bin/systemctl --user start earth-view.service
+        '')
+        + (lib.optionalString (cfg.gc.enable && cfg.gc.interval != null) ''
           run ${pkgs.systemd}/bin/systemctl --user start earth-view-gc.service
         '')
       );
