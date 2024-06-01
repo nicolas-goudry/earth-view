@@ -1,6 +1,6 @@
 # 🌎 earth-view
 
-![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge)](https://flakehub.com/flake/nicolas-goudry/earth-view)
+![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge)](https://flakehub.com/flake/nicolas-goudry/earth-view)
 
 Randomly set desktop background from 2600+ images sourced from [Google Earth View](https://earthview.withgoogle.com).
 
@@ -232,7 +232,9 @@ Examples:
 
 All discovered images URLs from Earth View are saved in [`earth-view.json`](./earth-view.json), which is the source of truth of this Nix module.
 
-To create this file, we use a [custom CLI application](./src/main.go) written in Go which provides commands to list and download images from Google Earth View. In particular, we use the `list` command which scrapes the Earth View static assets in order to find valid identifiers for images. If you want to use the CLI locally:
+To create this file, we use a [custom CLI application](./src/README.md) written in Go which provides commands to list and download images from Google Earth View. In particular, we use the [`list` command](./src/README.md#list) which scrapes the Earth View static assets in order to find valid identifiers for images.
+
+If you want to use the CLI locally:
 
 ```shell
 # Use go (go must be available in your path! Hint: nix shell 'nixpkgs#go_1_22')
@@ -253,7 +255,7 @@ nix build '.#earth-view' # ...or nix-build -A earth-view
 
 ### Image selection
 
-To select an image, the `fetch random` command is used to select a random image identifier from the source of truth, download it and save it to the `imageDirectory` directory.
+To select an image, the [`fetch random` command](./src/README.md#fetch-random) is used to select a random image identifier from the source of truth, download it and save it to the [`imageDirectory`](#imagedirectory) directory.
 
 ### systemd
 
