@@ -23,6 +23,17 @@ pkgs.writeScriptBin "start" ''
     exit 1
   fi
 
+  if test "${lib.boolToString cfg.autoUpscale}" = "true"; then
+    upscaled="''${file%.*}@4x.''${file##*.}"
+
+    if ! test -L $upscaled; then
+      if ${pkgs.realesrgan-ncnn-vulkan}/bin/realesrgan-ncnn-vulkan -i $file -o $upscaled -f ext/jpg; then
+        ${pkgs.coreutils}/bin/mv $upscaled $file
+        ${pkgs.coreutils}/bin/ln -s $file $upscaled
+      fi
+    fi
+  fi
+
   if test "$XDG_CURRENT_DESKTOP" = "GNOME"; then
     ${pkgs.coreutils}/bin/echo "GNOME detected, use gsettings"
     ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri file://$file
