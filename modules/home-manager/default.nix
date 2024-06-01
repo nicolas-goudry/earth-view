@@ -15,6 +15,9 @@ let
 
   cfg = config.services.earth-view;
   common = import ../_common args;
+  hmStartServices = config.systemd.user.startServices == true
+    || config.systemd.user.startServices == "legacy"
+    || config.systemd.user.startServices == "sd-switch";
   startScript = common.mkStartScript "$HOME/${cfg.imageDirectory}/.source";
 in
 {
@@ -82,7 +85,8 @@ in
       };
     })
     # Define activation script if autoStart or garbage collection with interval are enabled
-    (lib.mkIf (cfg.autoStart || (cfg.gc.enable && cfg.gc.interval != null)) {
+    # Skipped if home manager startServices is enabled
+    (lib.mkIf (hmStartServices == false && (cfg.autoStart || (cfg.gc.enable && cfg.gc.interval != null))) {
       home.activation.earth-view = lib.hm.dag.entryAfter [ "writeBoundary" ] (
         ''
           #!${pkgs.bash}/bin/bash
