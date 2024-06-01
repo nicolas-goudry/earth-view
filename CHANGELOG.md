@@ -1,5 +1,25 @@
 # Changelog
 
+## v2.2.0 - 01/06/2024
+
+🐞 **Bug Fixes**
+
+- Early run (on `graphical-session-pre.target`) failing to detect desktop
+- 🏠 Prevent auto start if Home Manager's `systemd.user.startServices` is enabled
+
+🚀 **Features**
+
+- Keep track of currently set background
+- Add automatic garbage collection through `gc` attribute set option
+
+✨ **Polish**
+
+- Rename `common` directory to `_common`
+- Rename `script.nix` to `start.nix`
+- Make assertions common to both modules
+- 🏠 Improve activation script
+- Use systemd dependencies to start timers
+
 ## v2.1.1 - 21/05/2024
 
 🐞 **Bug Fixes**
