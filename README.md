@@ -1,7 +1,6 @@
 # 🌎 earth-view
 
-![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge
-)](https://flakehub.com/flake/nicolas-goudry/earth-view)
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![NixOS](https://img.shields.io/badge/NIXOS-5277C3.svg?style=for-the-badge&logo=NixOS&logoColor=white) ![Home Manager](https://img.shields.io/badge/home%20manager-EC733B?style=for-the-badge) [![FlakeHub](https://img.shields.io/endpoint?url=https%3A%2F%2Fflakehub.com%2Ff%2Fnicolas-goudry%2Fearth-view%2Fbadge&style=for-the-badge)](https://flakehub.com/flake/nicolas-goudry/earth-view)
 
 Randomly set desktop background from 2600+ images sourced from [Google Earth View](https://earthview.withgoogle.com).
 
@@ -145,12 +144,18 @@ Currently supporting:
     display = "fill";
     enableXinerama = true;
     autoStart = false;
+    gc = {
+      enable = false;
+      keep = 10;
+      interval = null;
+      sizeThreshold = "0";
+    };
   };
 }
 ```
 
 > [!TIP]
-> If `autoStart` is set to `false`, the service will only be started on the next login. To set the background after installation you have to manually start the main service:
+> If [`autoStart`](#autostart) is set to `false`, the service will only be started on the next login. To set the background after installation you have to manually start the main service:
 >
 > ```shell
 > systemctl --user start earth-view
@@ -158,7 +163,7 @@ Currently supporting:
 >
 > This command can also be used to manually switch the background.
 >
-> Same goes for the timer, if `autoStart` is set to `false`, it will only be started on the next login. To launch the timer after installation you have to manually start it:
+> Same goes for the timer, if [`autoStart`](#autostart) is set to `false`, it will only be started on the next login. To launch the timer after installation you have to manually start it:
 >
 > ```shell
 > systemctl --user start earth-view.timer
@@ -194,12 +199,32 @@ Will place a separate image per screen when enabled, otherwise a single image wi
 
 ### `autoStart`
 
-Whether to start the service automatically, along with its timer when `interval` is set.
+Whether to start the service automatically, along with its timer when [`interval`](#interval) is set.
 
 > [!NOTE]
 > This feature relies on activation scripts from NixOS (`system.userActivationScripts`) and Home Manager (`home.activation`).
 >
 > If you are using Home Manager, you may want to use [`systemd.user.startServices`](https://nix-community.github.io/home-manager/options.xhtml#opt-systemd.user.startServices) instead.
+
+### `gc.enable`
+
+Whether to enable automatic garbage collection.
+
+### `gc.keep`
+
+The number of images to keep from being garbage collected. Only the most recent images will be kept. The current background will **never** be deleted.
+
+### `gc.interval`
+
+The duration between garbage collection runs. Set to `null` to run garbage collection along with the main service. Should be formatted as a [duration understood by systemd](https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Parsing%20Time%20Spans).
+
+### `gc.sizeThreshold`
+
+Garbage collect images only if collection size exceeds this threshold. Should be formatted as a string [understood by `du`'s size option](https://man.archlinux.org/man/du.1.en).
+
+Examples:
+* `"10M"` or `"10MiB"`: deletes images when collection exceeds 10MiB (power of 1024)
+* `"1GB"`: deletes images when collection exceeds 1GB (power of 1000)
 
 ## 🧐 How it works
 
@@ -232,7 +257,7 @@ To select an image, the `fetch random` command is used to select a random image 
 
 ### systemd
 
-Both modules use a systemd user-managed unit, along with a timer when `interval` is specified.
+Both modules use a systemd user-managed unit, along with a timer when [`interval`](#interval) is specified.
 
 The service executes a Bash script which uses the Go module described in the previous section to fetch the image and then set the desktop background accordingly. Read further for more details.
 
