@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.1 - 09/09/2025
+
+🐞 **Bug Fixes**
+
+- Update plasma-workspace package set (https://github.com/nicolas-goudry/earth-view/pull/15)
+
 ## v2.2.0 - 01/06/2024
 
 🐞 **Bug Fixes**
