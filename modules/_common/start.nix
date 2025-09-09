@@ -29,7 +29,7 @@ pkgs.writeScriptBin "start" ''
     ${pkgs.glib}/bin/gsettings set org.gnome.desktop.background picture-uri-dark file://$file
   elif test "$XDG_CURRENT_DESKTOP" = "KDE"; then
     ${pkgs.coreutils}/bin/echo "KDE detected, use plasma-apply-wallpaperimage"
-    ${pkgs.libsForQt5.plasma-workspace}/bin/plasma-apply-wallpaperimage $file
+    ${pkgs.kdePackages.plasma-workspace}/bin/plasma-apply-wallpaperimage $file
   else
     ${pkgs.coreutils}/bin/echo "Could not detect environment, use feh"
     ${pkgs.feh}/bin/feh ${fehFlags} $file
