@@ -223,8 +223,9 @@ The duration between garbage collection runs. Set to `null` to run garbage colle
 Garbage collect images only if collection size exceeds this threshold. Should be formatted as a string [understood by `du`'s size option](https://man.archlinux.org/man/du.1.en).
 
 Examples:
-* `"10M"` or `"10MiB"`: deletes images when collection exceeds 10MiB (power of 1024)
-* `"1GB"`: deletes images when collection exceeds 1GB (power of 1000)
+
+- `"10M"` or `"10MiB"`: deletes images when collection exceeds 10MiB (power of 1024)
+- `"1GB"`: deletes images when collection exceeds 1GB (power of 1000)
 
 ## 🧐 How it works
 

@@ -22,24 +22,25 @@ THE SOFTWARE.
 package fetch
 
 import (
-  "encoding/json"
-  "fmt"
-  "math/rand"
-  "os"
-  "strconv"
+	"encoding/json"
+	"fmt"
+	"math/rand"
+	"os"
+	"strconv"
 
-  "earth-view/lib"
-  "github.com/spf13/cobra"
+	"earth-view/lib"
+
+	"github.com/spf13/cobra"
 )
 
 var (
-  input string
+	input string
 
-  randomCmd = &cobra.Command{
-    Use: "random",
-    Aliases: []string{"rnd", "rand"},
-    Short: "Fetch random images",
-    Long: fmt.Sprintf(`Download a random Google Earth View image.
+	randomCmd = &cobra.Command{
+		Use:     "random",
+		Aliases: []string{"rnd", "rand"},
+		Short:   "Fetch random images",
+		Long: fmt.Sprintf(`Download a random Google Earth View image.
 
 Description:
   This command will download a random image using either the known possible
@@ -56,80 +57,87 @@ Description:
   not valid, another one will be chosen, until a valid identifier is found.
 
 %s`, helpText.process, helpText.output),
-    DisableFlagsInUseLine: true,
-    SilenceUsage: true,
-    Args: cobra.MaximumNArgs(0),
-    Run: func(cmd *cobra.Command, args []string) {
-      filePath, err := runFetchRandomCmd(input, output, overwrite)
-      cobra.CheckErr(err)
-      fmt.Println(filePath)
-    },
-  }
+		DisableFlagsInUseLine: true,
+		SilenceUsage:          true,
+		Args:                  cobra.MaximumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			filePath, err := runFetchRandomCmd(input, output, overwrite)
+			cobra.CheckErr(err)
+			fmt.Println(filePath)
+		},
+	}
 )
 
 func init() {
-  fetchCmd.AddCommand(randomCmd)
+	fetchCmd.AddCommand(randomCmd)
 
-  randomCmd.Flags().StringVarP(&input, "input", "i", "", "input file to choose an image from")
-  addCommonFlags(randomCmd.Flags())
+	randomCmd.Flags().StringVarP(&input, "input", "i", "", "input file to choose an image from")
+	addCommonFlags(randomCmd.Flags())
 }
 
 func runFetchRandomCmd(input string, output string, overwrite bool) (string, error) {
-  asset := lib.Asset{}
-  filePath, err := fetchRandomAsset(&asset, input, output, overwrite)
-  if err != nil {
-    return "", err
-  }
+	asset := lib.Asset{}
+	filePath, err := fetchRandomAsset(&asset, input, output, overwrite)
+	if err != nil {
+		return "", err
+	}
 
-  // Only write file if it does not yet exist or if overwrite is set
-  if lib.FileExists(filePath) == false || overwrite {
-    err := lib.WriteFile(asset.Content, filePath)
-    return filePath, err
-  }
+	// Only write file if it does not yet exist or if overwrite is set
+	if lib.FileExists(filePath) == false || overwrite {
+		err := lib.WriteFile(asset.Content, filePath)
+		return filePath, err
+	}
 
-  return filePath, nil
+	return filePath, nil
 }
 
 func pickRandomId(input string) (int, error) {
-  if input == "" {
-    return lib.KnownIdLowerBoundary + rand.Intn(lib.KnownIdUpperBoundary - lib.KnownIdLowerBoundary + 1), nil
-  }
+	if input == "" {
+		return lib.KnownIdLowerBoundary + rand.Intn(
+			lib.KnownIdUpperBoundary-lib.KnownIdLowerBoundary+1,
+		), nil
+	}
 
-  content, err := os.ReadFile(input)
-  if err != nil {
-    return -1, err
-  }
+	content, err := os.ReadFile(input)
+	if err != nil {
+		return -1, err
+	}
 
-  var ids []int
-  if err := json.Unmarshal(content, &ids); err != nil {
-    return -1, err
-  }
+	var ids []int
+	if err := json.Unmarshal(content, &ids); err != nil {
+		return -1, err
+	}
 
-  return ids[rand.Intn(len(ids))], nil
+	return ids[rand.Intn(len(ids))], nil
 }
 
-func fetchRandomAsset(asset *lib.Asset, input string, output string, overwrite bool) (string, error) {
-  randomId, err := pickRandomId(input)
-  if err != nil {
-    return "", err
-  }
+func fetchRandomAsset(
+	asset *lib.Asset,
+	input string,
+	output string,
+	overwrite bool,
+) (string, error) {
+	randomId, err := pickRandomId(input)
+	if err != nil {
+		return "", err
+	}
 
-  filePath, err := lib.ResolveAbsFilePath(output, strconv.Itoa(randomId) + ".jpeg")
-  if err != nil {
-    return "", err
-  }
+	filePath, err := lib.ResolveAbsFilePath(output, strconv.Itoa(randomId)+".jpeg")
+	if err != nil {
+		return "", err
+	}
 
-  // Only fetch file if it does not yet exist or if overwrite is set
-  if lib.FileExists(filePath) == false || overwrite {
-    asset.Id = randomId
-    if _, err := asset.GetContent(); err != nil {
-      if os.IsTimeout(err) {
-        return "", err
-      }
+	// Only fetch file if it does not yet exist or if overwrite is set
+	if lib.FileExists(filePath) == false || overwrite {
+		asset.Id = randomId
+		if _, err := asset.GetContent(); err != nil {
+			if os.IsTimeout(err) {
+				return "", err
+			}
 
-      return fetchRandomAsset(asset, input, output, overwrite)
-    }
-  }
+			return fetchRandomAsset(asset, input, output, overwrite)
+		}
+	}
 
-  return filePath, nil
+	return filePath, nil
 }

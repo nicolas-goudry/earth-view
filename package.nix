@@ -1,6 +1,6 @@
 { buildGoModule, lib, ... }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "earth-view";
   version = "1.0.0";
   src = ./src;
@@ -8,10 +8,10 @@ buildGoModule rec {
   doCheck = false;
 
   meta = {
+    mainProgram = finalAttrs.pname;
     description = "List and download Google Earth View images";
     homepage = "https://github.com/nicolas-goudry/earth-view";
     license = lib.licenses.mit;
     maintainers = [ lib.maintainers.nicolas-goudry ];
-    mainProgram = pname;
   };
-}
+})

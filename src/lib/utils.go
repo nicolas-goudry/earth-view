@@ -22,42 +22,42 @@ THE SOFTWARE.
 package lib
 
 import (
-  "os"
-  "path"
-  "path/filepath"
+	"os"
+	"path"
+	"path/filepath"
 )
 
 func ResolveAbsFilePath(outPath string, defaultFilename string) (string, error) {
-  if stat, err := os.Stat(outPath); err == nil {
-    if stat.IsDir() {
-      outPath = path.Join(outPath, defaultFilename)
-    }
-  }
+	if stat, err := os.Stat(outPath); err == nil {
+		if stat.IsDir() {
+			outPath = path.Join(outPath, defaultFilename)
+		}
+	}
 
-  if outPath == "" {
-    outPath = defaultFilename
-  }
+	if outPath == "" {
+		outPath = defaultFilename
+	}
 
-  absPath, err := filepath.Abs(outPath)
-  if err != nil {
-    return "", err
-  }
+	absPath, err := filepath.Abs(outPath)
+	if err != nil {
+		return "", err
+	}
 
-  return absPath, nil
+	return absPath, nil
 }
 
 func FileExists(filePath string) bool {
-  if _, err := os.Stat(filePath); err == nil {
-    return true
-  }
+	if _, err := os.Stat(filePath); err == nil {
+		return true
+	}
 
-  return false
+	return false
 }
 
 func WriteFile(content []byte, outPath string) error {
-  if err := os.WriteFile(outPath, content, 0644); err != nil {
-    return err
-  }
+	if err := os.WriteFile(outPath, content, 0644); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }

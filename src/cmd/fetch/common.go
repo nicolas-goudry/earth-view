@@ -22,30 +22,30 @@ THE SOFTWARE.
 package fetch
 
 import (
-  "github.com/spf13/pflag"
+	"github.com/spf13/pflag"
 )
 
 var (
-  output    string
-  overwrite bool
+	output    string
+	overwrite bool
 
-  helpText = struct {
-    process string
-    output string
-  }{
-    process: `  The image metadata is first retrieved from gstatic.com (the server hosting the
+	helpText = struct {
+		process string
+		output  string
+	}{
+		process: `  The image metadata is first retrieved from gstatic.com (the server hosting the
   images assets) then the image is decoded before being saved on the filesystem.`,
-    output: `  By default, the image is saved in the current working directory and its
+		output: `  By default, the image is saved in the current working directory and its
   identifier is used as the filename. This behaviour can be changed by using the
   '--output' flag. If the provided value is a directory, the file is saved into
   it and the image identifier is used as the filename.
 
   If the output file exists, it is not overwritten. This behaviour can be
   changed by using the '--overwrite' flag.`,
-  }
+	}
 )
 
 func addCommonFlags(f *pflag.FlagSet) {
-  f.StringVarP(&output, "output", "o", "", "write image to given file or directory")
-  f.BoolVar(&overwrite, "overwrite", false, "overwrite output file if it exists")
+	f.StringVarP(&output, "output", "o", "", "write image to given file or directory")
+	f.BoolVar(&overwrite, "overwrite", false, "overwrite output file if it exists")
 }

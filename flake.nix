@@ -3,14 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nix-formatter-pack.url = "github:Gerschtli/nix-formatter-pack";
-    nix-formatter-pack.inputs.nixpkgs.follows = "nixpkgs";
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self
-    , nix-formatter-pack
-    , nixpkgs
+    {
+      self,
+      nixpkgs,
+      treefmt-nix,
+      ...
     }:
     let
       systems = [
@@ -19,40 +24,47 @@
         "aarch64-darwin"
         "aarch64-linux"
       ];
-      forAllSystems = f: nixpkgs.lib.genAttrs systems f;
+      eachSystem = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
+      treefmtEval = eachSystem (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
     in
     {
+      # nix flake check
+      checks = eachSystem (
+        pkgs:
+        let
+          checks = {
+            formatting = treefmtEval.${pkgs.stdenv.hostPlatform.system}.config.build.check self;
+          };
+        in
+        checks
+        // {
+          all = pkgs.runCommand "all-checks" { buildInputs = builtins.attrValues checks; } "touch $out";
+        }
+      );
+
+      # nix fmt
+      formatter = eachSystem (pkgs: treefmtEval.${pkgs.stdenv.hostPlatform.system}.config.build.wrapper);
+
+      # Home Manager module
       homeManagerModules.earth-view = import ./modules/home-manager;
+
+      # NixOS module
       nixosModules = {
         earth-view = import ./modules/nixos;
         default = self.nixosModules.earth-view;
       };
 
-      devShells = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          default = pkgs.callPackage ./shell.nix { };
-        });
-
-      formatter = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        nix-formatter-pack.lib.mkFormatter {
-          inherit pkgs;
-
-          config.tools = {
-            deadnix.enable = true;
-            nixpkgs-fmt.enable = true;
-            statix.enable = true;
-          };
-        });
-
-      packages = forAllSystems (system:
+      # Packages
+      packages = eachSystem (
+        pkgs:
         import ./. {
-          pkgs = import nixpkgs { inherit system; };
-        });
+          inherit pkgs;
+        }
+      );
+
+      # Development environment with packages used by the module available in PATH
+      devShells = eachSystem (pkgs: {
+        default = pkgs.callPackage ./shell.nix { };
+      });
     };
 }

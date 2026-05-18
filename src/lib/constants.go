@@ -22,8 +22,7 @@ THE SOFTWARE.
 package lib
 
 const (
-  baseUrl = "https://www.gstatic.com/prettyearth/assets/data/v3"
-  KnownIdLowerBoundary = 1000
-  KnownIdUpperBoundary = 15000
+	baseUrl              = "https://www.gstatic.com/prettyearth/assets/data/v3"
+	KnownIdLowerBoundary = 1000
+	KnownIdUpperBoundary = 15000
 )
-

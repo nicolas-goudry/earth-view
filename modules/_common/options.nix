@@ -31,7 +31,13 @@
   };
 
   display = lib.mkOption {
-    type = lib.types.enum [ "center" "fill" "max" "scale" "tile" ];
+    type = lib.types.enum [
+      "center"
+      "fill"
+      "max"
+      "scale"
+      "tile"
+    ];
     default = "fill";
     description = ''
       Display background images according to this option.

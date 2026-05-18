@@ -22,23 +22,24 @@ THE SOFTWARE.
 package list
 
 import (
-  "fmt"
+	"fmt"
 
-  "earth-view/cmd"
-  "github.com/spf13/cobra"
+	"earth-view/cmd"
+
+	"github.com/spf13/cobra"
 )
 
 var (
-  batchSize int
-  output    string
-  quiet     bool
-  retry     int
+	batchSize int
+	output    string
+	quiet     bool
+	retry     int
 
-  listCmd = &cobra.Command{
-    Use: "list",
-    Aliases: []string{"ls"},
-    Short: "Get images list",
-    Long: `Get a list of Google Earth View images
+	listCmd = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "Get images list",
+		Long: `Get a list of Google Earth View images
 
 Description:
   This command will try to fetch images from gstatic.com using a known range of
@@ -52,29 +53,31 @@ Description:
   By default, the generated list is output to the standard output. This
   behaviour can be changed by using the '--output' flag. If the provided value
   is a directory, the file will be named 'earth-view.json'.`,
-    DisableFlagsInUseLine: true,
-    SilenceUsage: true,
-    Args: cobra.MaximumNArgs(0),
-    PreRunE: func(_ *cobra.Command, _ []string) error {
-      if output == "" && quiet {
-        return fmt.Errorf("--quiet cannot be provided when --output is not set")
-      }
+		DisableFlagsInUseLine: true,
+		SilenceUsage:          true,
+		Args:                  cobra.MaximumNArgs(0),
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if output == "" && quiet {
+				return fmt.Errorf("--quiet cannot be provided when --output is not set")
+			}
 
-      return nil
-    },
-    Run: func(_ *cobra.Command, _ []string) {
-      // Call main function which starts the program
-      main()
-    },
-  }
+			return nil
+		},
+		Run: func(_ *cobra.Command, _ []string) {
+			// Call main function which starts the program
+			main()
+		},
+	}
 )
 
 func init() {
-  cmd.RootCmd.AddCommand(listCmd)
+	cmd.RootCmd.AddCommand(listCmd)
 
-  listCmd.Flags().IntVarP(&batchSize, "batch-size", "b", 20, `number of parallel calls to gstatic.com
+	listCmd.Flags().
+		IntVarP(&batchSize, "batch-size", "b", 20, `number of parallel calls to gstatic.com
 Using a high value may result in potentially wrong failures to fetch images`)
-  listCmd.Flags().StringVarP(&output, "output", "o", "", "write to file instead of stdout")
-  listCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "do not output anything")
-  listCmd.Flags().IntVarP(&retry, "retry", "r", 3, "number of retries before skipping an image in case of non 200 HTTP status code")
+	listCmd.Flags().StringVarP(&output, "output", "o", "", "write to file instead of stdout")
+	listCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "do not output anything")
+	listCmd.Flags().
+		IntVarP(&retry, "retry", "r", 3, "number of retries before skipping an image in case of non 200 HTTP status code")
 }

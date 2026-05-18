@@ -1,13 +1,22 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit ((pkgs.callPackage ../../. { inherit pkgs; })) earth-view;
 
   cfg = config.services.earth-view;
 
-  fehFlags = lib.concatStringsSep " "
-    ([ "--bg-${cfg.display}" "--no-fehbg" ]
-      ++ lib.optional (!cfg.enableXinerama) "--no-xinerama");
+  fehFlags = lib.concatStringsSep " " (
+    [
+      "--bg-${cfg.display}"
+      "--no-fehbg"
+    ]
+    ++ lib.optional (!cfg.enableXinerama) "--no-xinerama"
+  );
 in
 source:
 pkgs.writeScriptBin "start" ''

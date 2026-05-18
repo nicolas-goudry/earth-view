@@ -22,14 +22,14 @@ THE SOFTWARE.
 package cmd
 
 import (
-  "os"
+	"os"
 
-  "github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 )
 
 var RootCmd = &cobra.Command{
-  Use: "earth-view",
-  Long: `earth-view interacts with Google Earth View image assets.
+	Use: "earth-view",
+	Long: `earth-view interacts with Google Earth View image assets.
 
 Description:
   Google Earth View was originally a website to showcase and explore beautiful
@@ -39,14 +39,14 @@ Description:
 
   The main goal of this program is to provide a convenient way to list the
   available images and download them on the filesystem.`,
-  CompletionOptions: cobra.CompletionOptions{
-    DisableDefaultCmd: true,
-  },
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	},
 }
 
 func Execute() {
-  err := RootCmd.Execute()
-  if err != nil {
-    os.Exit(1)
-  }
+	err := RootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }
